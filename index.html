@@ -44,16 +44,69 @@
 
         /* Files List Styles */
         #files-list { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .file-card { 
-            background: var(--white); padding: 20px; border-radius: 15px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03); border-right: 5px solid var(--primary-color);
-        }
-        .file-name { font-weight: 600; font-size: 1rem; color: var(--text-dark); text-align: right; }
-        .download-link { 
-            background: var(--primary-color); color: var(--white); 
-            padding: 10px 20px; border-radius: 10px; text-decoration: none; 
-            font-size: 0.9rem; font-weight: bold; transition: 0.3s;
+       /* حاوية الملفات */
+#files-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* مسافة بين البطاقات */
+    width: 100%;
+}
+
+/* بطاقة الملف */
+.file-card { 
+    background: var(--white); 
+    padding: 20px; 
+    border-radius: 15px; 
+    display: flex; 
+    flex-direction: column; /* ترتيب العناصر عمودياً في الموبايل */
+    align-items: center; 
+    gap: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+    border-right: 6px solid var(--primary-color);
+    width: 100%; /* تأخذ كامل عرض الحاوية */
+    max-width: 100%; /* تمنع الخروج عن الشاشة */
+    box-sizing: border-box; /* لضمان حساب الـ padding ضمن العرض */
+}
+
+/* تنسيق الاسم ليظهر كاملاً */
+.file-name { 
+    font-weight: 600; 
+    font-size: 1.05rem; 
+    color: var(--text-dark); 
+    text-align: center; 
+    word-wrap: break-word; /* كسر الكلمات الطويلة جداً */
+    overflow-wrap: break-word;
+    width: 100%; /* ضمان استغلال كامل المساحة */
+    line-height: 1.6;
+}
+
+/* زر التحميل */
+.download-link { 
+    background: var(--primary-color); 
+    color: var(--white); 
+    padding: 12px 25px; 
+    border-radius: 10px; 
+    text-decoration: none; 
+    font-size: 0.95rem; 
+    font-weight: bold; 
+    transition: var(--transition);
+    width: auto; /* الزر يأخذ مساحة النص فقط */
+    min-width: 140px;
+    text-align: center;
+}
+
+/* تحسين العرض للشاشات الكبيرة (الكمبيوتر) */
+@media (min-width: 600px) {
+    .file-card {
+        flex-direction: row; /* العناصر بجانب بعضها في الشاشات الواسعة */
+        justify-content: space-between;
+        text-align: right;
+    }
+    .file-name {
+        text-align: right;
+    }
+}
         }
         .download-link:hover { background: var(--accent-color); color: var(--primary-color); }
 
