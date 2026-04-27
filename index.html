@@ -130,39 +130,36 @@
             showScreen('years-screen');
         }
 
-        // جلب الملفات من Firebase
-        window.loadFiles = function(year) {
-            document.getElementById('files-title').innerText = `${selectedSubject} - لعام ${year}`;
-            const listContainer = document.getElementById('files-list');
-            const loader = document.getElementById('loader');
-            
-            listContainer.innerHTML = "";
-            loader.style.display = "block";
-            showScreen('files-screen');
+     window.loadFiles = function(year) {
+    const listContainer = document.getElementById('files-list');
+    listContainer.innerHTML = "<p>جاري التحقق من المسار...</p>";
+    showScreen('files-screen');
 
-            const filesRef = ref(db, `nibras/${selectedSubject}/${year}`);
-            
-            onValue(filesRef, (snapshot) => {
-                loader.style.display = "none";
-                const data = snapshot.val();
-                
-                if (data) {
-                    Object.keys(data).forEach(fileId => {
-                        const file = data[fileId];
-                        listContainer.innerHTML += `
-                            <div class="file-card">
-                                <div class="file-name">${file.name}</div>
-                                <a href="${file.url}" target="_blank" class="download-link">فتح الملف</a>
-                            </div>
-                        `;
-                    });
-                } else {
-                    listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات متوفرة حالياً لهذا العام.</p>";
-                }
-            }, {
-                onlyOnce: true
+    // جرب هذا المسار (تأكد هل يوجد nibras في قاعدة بياناتك أم لا؟)
+    const path = `${selectedSubject}/${year}`; 
+    console.log("المسار الذي يتم البحث فيه حالياً هو: ", path);
+
+    const filesRef = ref(db, path);
+    
+    onValue(filesRef, (snapshot) => {
+        const data = snapshot.val();
+        console.log("البيانات التي وصلت من Firebase: ", data); // راقب الـ Console هنا
+
+        if (data) {
+            listContainer.innerHTML = "";
+            Object.values(data).forEach(file => {
+                listContainer.innerHTML += `
+                    <div class="file-card">
+                        <div class="file-name">${file.name}</div>
+                        <a href="${file.url}" target="_blank" class="download-link">فتح الملف</a>
+                    </div>
+                `;
             });
+        } else {
+            listContainer.innerHTML = `<p>لم يتم العثور على بيانات في المسار: ${path}</p>`;
         }
+    }, { onlyOnce: true });
+}
     </script>
 </body>
 </html>
