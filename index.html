@@ -112,17 +112,129 @@
 
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* --- 1. جعل القائمة الرئيسية عمودية --- */
+#subjects-screen .btn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#years-screen .btn-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+}
+
+/* --- 2. تعديل الشريط العلوي (الأيقونة على اليسار) --- */
+.navbar { 
+    display: flex; 
+    flex-direction: row-reverse; /* لعكس الترتيب في الشاشة العربية */
+    justify-content: space-between; 
+    align-items: center; 
+}
+.menu-icon { cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
+.menu-icon span { width: 30px; height: 4px; background-color: var(--primary-color); border-radius: 2px; }
+
+/* --- 3. اللمسة الفنية للقائمة الجانبية (على اليسار) --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -320px; /* مخفية على اليسار */
+    width: 320px;
+    height: 100%;
+    background: linear-gradient(145deg, #ffffff 0%, #f1f2f6 100%);
+    box-shadow: 5px 0 25px rgba(0,0,0,0.15);
+    transition: var(--transition);
+    z-index: 1000;
+    padding: 30px 20px;
+    overflow-y: auto;
+    border-right: 4px solid var(--accent-color);
+}
+.sidebar.active { left: 0; }
+.sidebar-header { text-align: center; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 2px dashed #dcdde1; }
+.sidebar-header h3 { color: var(--primary-color); font-size: 1.5rem; font-weight: 900;}
+
+/* زر تسجيل الدخول */
+.login-btn {
+    display: block; width: 100%; text-align: center;
+    background: var(--accent-color); color: var(--primary-color);
+    padding: 15px; border-radius: 10px; font-weight: bold;
+    text-decoration: none; margin-bottom: 25px; transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(246, 185, 59, 0.3);
+}
+.login-btn:hover { background: var(--primary-color); color: var(--white); transform: translateY(-3px); }
+
+/* القوائم المنسدلة (Accordion) */
+.accordion-item { margin-bottom: 15px; border-radius: 12px; overflow: hidden; background: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.accordion-btn {
+    background: var(--white); color: var(--primary-color);
+    cursor: pointer; padding: 18px; width: 100%; border: none;
+    text-align: right; outline: none; font-size: 1rem; font-weight: bold;
+    transition: 0.4s; display: flex; justify-content: space-between; align-items: center;
+}
+.accordion-btn:hover, .accordion-btn.active { background: var(--primary-color); color: var(--white); }
+.accordion-btn::after { content: '\002B'; font-size: 1.5rem; transition: 0.3s; }
+.accordion-btn.active::after { content: '\2212'; transform: rotate(180deg); }
+
+.accordion-content {
+    padding: 0 18px; background-color: #fafbfc;
+    max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-dark);
+}
+.accordion-content p { padding: 15px 0; }
+.accordion-content a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
+
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 900; backdrop-filter: blur(3px); }
+.overlay.active { display: block; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="logo">فريق النبراس التطوعي</div>
-    </nav>
+   <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+        <h3>فريق النبراس</h3>
+    </div>
+    
+    <a href="#" class="login-btn">تسجيل الدخول للاحتفاظ بالتقدم</a>
+
+    <div class="accordion-item">
+        <button class="accordion-btn">نبذة عن الفريق</button>
+        <div class="accordion-content">
+            <p>فريق النبراس التطوعي، هو فريق غير ربحي يتكون من طلابٍ سابقين في معهد النبراس على اختلاف اختصاصاتهم الجامعية، أهداف الفريق تتمثل بالارتقاء بمستوى الطلاب إلى مستوى يمكّنهم من الوصول إلى غاياتهم ومرادهم في مستقبلهم، والسبيل إلى ذلك بعد توفيقه تعالى هو نشر النماذج المتعددة والمتنوعة والاختبارات السابقة للمواد الدراسيّة -باستثناء مادتي الفيزياء واللغة الفرنسية- قاصدين بذلك إتاحة الفرصة أمام الطالب ليتدرب ويصقل مهاراته العلمية، ويصحح لنفسه ويعرف أخطاءه فيتجنب الوقوع فيها لاحقاً، واللهَ نسألُ التوفيقَ والسداد.</p>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <button class="accordion-btn">مجموعة المناقشة الدراسية</button>
+        <div class="accordion-content">
+            <p>ضع سؤالك في مجموعة المناقشة وسنجيب بأسرع وقت!<br><br>
+            رابط المناقشة:<br>
+            <a href="https://t.me/+Efbvekrb6lBhNWQ0" target="_blank" dir="ltr" style="display:inline-block; margin-top:5px;">https://t.me/+Efbvekrb6lBhNWQ0</a></p>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <button class="accordion-btn">المطور</button>
+        <div class="accordion-content">
+            <p style="direction: ltr; text-align: right; font-weight: bold; color: var(--primary-color);">
+                maher.ghzzawi@gmail.com
+            </p>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar">
+    <div class="logo">فريق النبراس التطوعي</div>
+    <div class="menu-icon" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
 
     <main class="main-content">
         <section id="subjects-screen" class="screen active">
-            <h2>المواد العلمية</h2>
+            <h2>المواد الدراسية</h2>
             <div class="btn-list">
                 <button class="btn" onclick="openYearScreen('الرياضيات')">الرياضيات</button>
                 <button class="btn" onclick="openYearScreen('العلوم')">العلوم</button>
@@ -213,6 +325,36 @@
         }
     }, { onlyOnce: true });
 }
+        // فتح وإغلاق القائمة الجانبية
+window.toggleSidebar = function() {
+    document.getElementById('sidebar').classList.toggle('active');
+    document.getElementById('overlay').classList.toggle('active');
+}
+
+// تفعيل حركة القوائم المنسدلة (Accordion) بمرونة
+document.addEventListener('DOMContentLoaded', function() {
+    const acc = document.getElementsByClassName("accordion-btn");
+    for (let i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            // إغلاق أي قائمة أخرى مفتوحة (اختياري لترتيب الشكل)
+            for (let j = 0; j < acc.length; j++) {
+                if (acc[j] !== this && acc[j].classList.contains("active")) {
+                    acc[j].classList.remove("active");
+                    acc[j].nextElementSibling.style.maxHeight = null;
+                }
+            }
+            
+            // فتح أو إغلاق القائمة الحالية
+            this.classList.toggle("active");
+            const panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    }
+});
     </script>
 </body>
 </html>
