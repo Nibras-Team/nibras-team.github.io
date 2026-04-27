@@ -8,8 +8,8 @@
     <style>
         /* --- المتغيرات والألوان --- */
         :root {
-            --primary-color: #1e3799; /* أزرق ملكي للنبراس */
-            --accent-color: #f6b93b;  /* لون ذهبي يرمز للضوء */
+            --primary-color: #1e3799; 
+            --accent-color: #f6b93b;  
             --bg-color: #f1f2f6;
             --white: #ffffff;
             --text-dark: #2f3542;
@@ -35,7 +35,7 @@
         .sidebar {
             position: fixed;
             top: 0;
-            left: -280px; /* مخفية لليسار */
+            left: -280px;
             width: 280px;
             height: 100%;
             background: var(--white);
@@ -103,7 +103,6 @@
             height: 3px;
             background-color: var(--primary-color);
             border-radius: 2px;
-            transition: var(--transition);
         }
 
         .logo {
@@ -158,18 +157,11 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             transition: var(--transition);
-            position: relative;
-            overflow: hidden;
         }
 
         .btn:hover {
             border-color: var(--accent-color);
             transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(30, 55, 153, 0.15);
-        }
-
-        .btn:active {
-            transform: scale(0.98);
         }
 
         .back-btn {
@@ -179,31 +171,19 @@
             color: var(--text-dark);
             font-weight: bold;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: var(--transition);
+            font-size: 1rem;
         }
 
-        .back-btn:hover {
-            color: var(--accent-color);
-        }
-
-        /* --- تأثير خلفية النافذة --- */
         .overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0,0,0,0.3);
             display: none;
             z-index: 900;
         }
 
-        .overlay.active {
-            display: block;
-        }
+        .overlay.active { display: block; }
     </style>
 </head>
 <body>
@@ -228,10 +208,10 @@
             <span></span>
         </div>
         <div class="logo">فريق النبراس التطوعي</div>
-        <div style="width: 30px;"></div> </nav>
+        <div style="width: 30px;"></div> 
+    </nav>
 
     <main class="main-content">
-        
         <section id="subjects-screen" class="screen active">
             <h2>المواد العلمية</h2>
             <div class="btn-list">
@@ -247,120 +227,87 @@
             <button class="back-btn" onclick="openSubjectScreen()"> &rarr; العودة للمواد</button>
             <h2 id="subject-title">المادة المختارة</h2>
             <div class="btn-list">
-                <button class="btn">2023</button>
-                <button class="btn">2024</button>
-                <button class="btn">2025</button>
-                <button class="btn">2026</button>
+                <button class="btn" onclick="prepareUpload('2023')">عام 2023</button>
+                <button class="btn" onclick="prepareUpload('2024')">عام 2024</button>
+                <button class="btn" onclick="prepareUpload('2025')">عام 2025</button>
+                <button class="btn" onclick="prepareUpload('2026')">عام 2026</button>
             </div>
+            <input type="file" id="fileInput" style="display: none;">
         </section>
-
     </main>
 
-    <script>
-        // دالة فتح وإغلاق القائمة الجانبية
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+
+        let currentYear = "";
+        let currentSubject = "";
+
+        // تعريف الدوال على نافذة المتصفح لتكون قابلة للاستدعاء من HTML
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
         }
 
-        // دالة الانتقال لشاشة السنوات
-        function openYearScreen(subjectName) {
+        window.openYearScreen = function(subjectName) {
+            currentSubject = subjectName;
             document.getElementById('subjects-screen').classList.remove('active');
             document.getElementById('years-screen').classList.add('active');
             document.getElementById('subject-title').innerText = subjectName;
-            
-            // تمرير للأعلى لضمان رؤية البداية
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // دالة العودة لشاشة المواد
-        function openSubjectScreen() {
+        window.openSubjectScreen = function() {
             document.getElementById('years-screen').classList.remove('active');
             document.getElementById('subjects-screen').classList.add('active');
         }
-    
-‏// 1. استيراد المكتبات من CDN
-‏import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-‏import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-‏
-‏// 2. إعداداتك الخاصة (ضع الكود الذي نسخته هنا)
-‏// 1. استيراد المكتبات من CDN
-‏import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-‏import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-‏
-‏// 2. إعداداتك الخاصة (ضع الكود الذي نسخته هنا)
-‏const firebaseConfig = {
-‏    apiKey: "YOUR_API_KEY",
-‏    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-‏    projectId: "YOUR_PROJECT_ID",
-‏    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-‏    messagingSenderId: "YOUR_SENDER_ID",
-‏    appId: "YOUR_APP_ID"
-‏};
-‏
-‏// 3. تهيئة فايربيس
-‏const app = initializeApp(firebaseConfig);
-‏const storage = getStorage(app);
-‏
-‏// 4. دالة الرفع الاحترافية
-‏window.uploadToNibras = function(file, subject, year) {
-‏    if (!file) return;
-‏
-‏    // إنشاء مسار منظم: المواد/السنة/اسم_الملف
-‏    const storageRef = ref(storage, `نبراس/${subject}/${year}/${file.name}`);
-‏    const uploadTask = uploadBytesResumable(storageRef, file);
-‏
-‏    // مراقبة حالة الرفع
-‏    uploadTask.on('state_changed', 
-‏        (snapshot) => {
-‏            // هنا يمكنك حساب نسبة التقدم (Progress Bar) مستقبلاً
-‏            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-‏            console.log('نسبة الرفع: ' + progress + '%');
-‏        }, 
-‏        (error) => {
-‏            console.error("حدث خطأ:", error);
-‏            alert("فشل الرفع، تأكد من إعدادات الـ Rules في Firebase");
-‏        }, 
-‏        () => {
-‏            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-‏                alert("تم رفع الملف بنجاح إلى فريق النبراس!\nرابط الملف: " + downloadURL);
-‏            });
-‏        }
-‏    );
-‏};
-‏
-‏
-‏// 3. تهيئة فايربيس
-‏const app = initializeApp(firebaseConfig);
-‏const storage = getStorage(app);
-‏
-‏// 4. دالة الرفع الاحترافية
-‏window.uploadToNibras = function(file, subject, year) {
-‏    if (!file) return;
-‏
-‏    // إنشاء مسار منظم: المواد/السنة/اسم_الملف
-‏    const storageRef = ref(storage, `نبراس/${subject}/${year}/${file.name}`);
-‏    const uploadTask = uploadBytesResumable(storageRef, file);
-‏
-‏    // مراقبة حالة الرفع
-‏    uploadTask.on('state_changed', 
-‏        (snapshot) => {
-‏            // هنا يمكنك حساب نسبة التقدم (Progress Bar) مستقبلاً
-‏            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-‏            console.log('نسبة الرفع: ' + progress + '%');
-‏        }, 
-‏        (error) => {
-‏            console.error("حدث خطأ:", error);
-‏            alert("فشل الرفع، تأكد من إعدادات الـ Rules في Firebase");
-‏        }, 
-‏        () => {
-‏            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-‏                alert("تم رفع الملف بنجاح إلى فريق النبراس!\nرابط الملف: " + downloadURL);
-‏            });
-‏        }
-‏    );
-‏};</script> 
+
+        window.prepareUpload = function(year) {
+            currentYear = year;
+            document.getElementById('fileInput').click();
+        }
+
+        // التعامل مع تغيير الملف (بدء الرفع)
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadToNibras(file, currentSubject, currentYear);
+            }
+        });
+
+        function uploadToNibras(file, subject, year) {
+            const storageRef = ref(storage, `نبراس/${subject}/${year}/${file.name}`);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('نسبة الرفع: ' + progress.toFixed(2) + '%');
+                }, 
+                (error) => {
+                    console.error("حدث خطأ:", error);
+                    alert("فشل الرفع! تأكد من إعدادات القواعد (Rules) في Firebase Storage.");
+                }, 
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        alert("تم رفع الملف بنجاح لفريق النبراس!\nالمادة: " + subject + "\nالسنة: " + year);
+                        console.log("رابط الملف:", downloadURL);
+                    });
+                }
+            );
+        }
+    </script>
 </body>
 </html>
