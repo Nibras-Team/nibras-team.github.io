@@ -6,7 +6,7 @@
     <title>فريق النبراس التطوعي - المنصة التعليمية</title>
     
     <style>
-        /* --- المتغيرات والألوان --- */
+        /* --- التنسيقات الأصلية (نفس كودك السابق) --- */
         :root {
             --primary-color: #1e3799; 
             --accent-color: #f6b93b;  
@@ -16,174 +16,40 @@
             --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- التنسيق العام --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-dark); min-height: 100vh; overflow-x: hidden; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+        .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: var(--white); box-shadow: 5px 0 20px rgba(0,0,0,0.1); transition: var(--transition); z-index: 1000; padding: 40px 20px; }
+        .sidebar.active { left: 0; }
+        .sidebar h3 { color: var(--primary-color); margin-bottom: 30px; text-align: center; border-bottom: 2px solid var(--bg-color); padding-bottom: 10px; }
+        .sidebar-links { list-style: none; }
+        .sidebar-links li { margin: 15px 0; }
+        .sidebar-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; display: block; padding: 12px; border-radius: 8px; transition: var(--transition); }
+        .sidebar-links a:hover { background: var(--primary-color); color: var(--white); transform: translateX(-5px); }
 
-        /* --- القائمة الجانبية (اليسار) --- */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background: var(--white);
-            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
-            transition: var(--transition);
-            z-index: 1000;
-            padding: 40px 20px;
-        }
+        .navbar { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .menu-icon { cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
+        .menu-icon span { width: 30px; height: 3px; background-color: var(--primary-color); border-radius: 2px; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
 
-        .sidebar.active {
-            left: 0;
-        }
+        .main-content { padding: 40px 20px; max-width: 600px; margin: 0 auto; text-align: center; }
+        .screen { display: none; animation: slideUp 0.6s ease forwards; }
+        .screen.active { display: block; }
 
-        .sidebar h3 {
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            text-align: center;
-            border-bottom: 2px solid var(--bg-color);
-            padding-bottom: 10px;
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .sidebar-links {
-            list-style: none;
-        }
-
-        .sidebar-links li {
-            margin: 15px 0;
-        }
-
-        .sidebar-links a {
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 600;
-            display: block;
-            padding: 12px;
-            border-radius: 8px;
-            transition: var(--transition);
-        }
-
-        .sidebar-links a:hover {
-            background: var(--primary-color);
-            color: var(--white);
-            transform: translateX(-5px);
-        }
-
-        /* --- شريط التنقل --- */
-        .navbar {
-            padding: 20px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--white);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .menu-icon {
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .menu-icon span {
-            width: 30px;
-            height: 3px;
-            background-color: var(--primary-color);
-            border-radius: 2px;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        /* --- الحاوية والشاشات --- */
-        .main-content {
-            padding: 40px 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .screen {
-            display: none;
-            animation: slideUp 0.6s ease forwards;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            margin-bottom: 30px;
-            font-size: 1.8rem;
-            color: var(--primary-color);
-        }
-
-        /* --- الأزرار --- */
-        .btn-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .btn {
-            background: var(--white);
-            border: 2px solid transparent;
-            padding: 18px;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: var(--transition);
-        }
-
-        .btn:hover {
-            border-color: var(--accent-color);
-            transform: scale(1.02);
-        }
-
-        .back-btn {
-            margin-bottom: 20px;
-            background: none;
-            border: none;
-            color: var(--text-dark);
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3);
-            display: none;
-            z-index: 900;
-        }
-
+        h2 { margin-bottom: 30px; font-size: 1.8rem; color: var(--primary-color); }
+        .btn-list { display: flex; flex-direction: column; gap: 15px; }
+        .btn { background: var(--white); border: 2px solid transparent; padding: 18px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; color: var(--primary-color); cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: var(--transition); }
+        .btn:hover { border-color: var(--accent-color); transform: scale(1.02); }
+        .back-btn { margin-bottom: 20px; background: none; border: none; color: var(--text-dark); font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; z-index: 900; }
         .overlay.active { display: block; }
+
+        /* تنسيق إضافي لمدخلات الروابط */
+        .input-group { margin-bottom: 20px; background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .custom-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.3s; }
+        .custom-input:focus { border-color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -202,11 +68,7 @@
     <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
 
     <nav class="navbar">
-        <div class="menu-icon" onclick="toggleSidebar()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <div class="menu-icon" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
         <div class="logo">فريق النبراس التطوعي</div>
         <div style="width: 30px;"></div> 
     </nav>
@@ -226,36 +88,40 @@
         <section id="years-screen" class="screen">
             <button class="back-btn" onclick="openSubjectScreen()"> &rarr; العودة للمواد</button>
             <h2 id="subject-title">المادة المختارة</h2>
-            <div class="btn-list">
-                <button class="btn" onclick="prepareUpload('2023')">عام 2023</button>
-                <button class="btn" onclick="prepareUpload('2024')">عام 2024</button>
-                <button class="btn" onclick="prepareUpload('2025')">عام 2025</button>
-                <button class="btn" onclick="prepareUpload('2026')">عام 2026</button>
+            
+            <div class="input-group">
+                <input type="text" id="fileNameInput" class="custom-input" placeholder="اسم الملف (مثال: نوطة الوحدة الأولى)">
+                <input type="text" id="fileLinkInput" class="custom-input" placeholder="رابط الملف (Drive أو Telegram)">
             </div>
-            <input type="file" id="fileInput" style="display: none;">
+
+            <div class="btn-list">
+                <button class="btn" onclick="saveToDatabase('2023')">حفظ في عام 2023</button>
+                <button class="btn" onclick="saveToDatabase('2024')">حفظ في عام 2024</button>
+                <button class="btn" onclick="saveToDatabase('2025')">حفظ في عام 2025</button>
+                <button class="btn" onclick="saveToDatabase('2026')">حفظ في عام 2026</button>
+            </div>
         </section>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+        // إعدادات مشروعك (تأكد أن databaseURL صحيحة)
         const firebaseConfig = {
             apiKey: "AIzaSyBZIfcH0HI0Nm3aXN8uoP4C6y49cF0Qvl4",
             authDomain: "al-nibras-bf98e.firebaseapp.com",
             projectId: "al-nibras-bf98e",
-            storageBucket: "al-nibras-bf98e.appspot.com",
+            databaseURL: "https://al-nibras-bf98e-default-rtdb.firebaseio.com", 
             messagingSenderId: "453402650871",
             appId: "1:453402650871:web:092b37acf5c8575ec88bf2"
         };
 
         const app = initializeApp(firebaseConfig);
-        const storage = getStorage(app);
+        const db = getDatabase(app);
 
-        let currentYear = "";
         let currentSubject = "";
 
-        // تعريف الدوال على نافذة المتصفح لتكون قابلة للاستدعاء من HTML
         window.toggleSidebar = function() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
@@ -274,39 +140,30 @@
             document.getElementById('subjects-screen').classList.add('active');
         }
 
-        window.prepareUpload = function(year) {
-            currentYear = year;
-            document.getElementById('fileInput').click();
-        }
+        window.saveToDatabase = function(year) {
+            const fileUrl = document.getElementById('fileLinkInput').value;
+            const fileName = document.getElementById('fileNameInput').value;
 
-        // التعامل مع تغيير الملف (بدء الرفع)
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                uploadToNibras(file, currentSubject, currentYear);
+            if (!fileUrl || !fileName) {
+                alert("يرجى إدخال اسم الملف والرابط");
+                return;
             }
-        });
 
-        function uploadToNibras(file, subject, year) {
-            const storageRef = ref(storage, `نبراس/${subject}/${year}/${file.name}`);
-            const uploadTask = uploadBytesResumable(storageRef, file);
+            // المسار في قاعدة البيانات: nibras -> المادة -> السنة -> ملف فريد
+            const dbPath = ref(db, `nibras/${currentSubject}/${year}`);
+            const newFileRef = push(dbPath); 
 
-            uploadTask.on('state_changed', 
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log('نسبة الرفع: ' + progress.toFixed(2) + '%');
-                }, 
-                (error) => {
-                    console.error("حدث خطأ:", error);
-                    alert("فشل الرفع! تأكد من إعدادات القواعد (Rules) في Firebase Storage.");
-                }, 
-                () => {
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        alert("تم رفع الملف بنجاح لفريق النبراس!\nالمادة: " + subject + "\nالسنة: " + year);
-                        console.log("رابط الملف:", downloadURL);
-                    });
-                }
-            );
+            set(newFileRef, {
+                name: fileName,
+                url: fileUrl,
+                date: new Date().toLocaleDateString('ar-SA')
+            }).then(() => {
+                alert("تمت الإضافة بنجاح للمنصة التعليمية!");
+                document.getElementById('fileLinkInput').value = "";
+                document.getElementById('fileNameInput').value = "";
+            }).catch((e) => {
+                alert("فشل الحفظ: " + e.message);
+            });
         }
     </script>
 </body>
