@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فريق النبراس التطوعي - المنصة التعليمية</title>
+    <title>فريق النبراس التطوعي - مكتبة الملفات</title>
     
     <style>
-        /* --- التنسيقات الأصلية (نفس كودك السابق) --- */
         :root {
             --primary-color: #1e3799; 
             --accent-color: #f6b93b;  
@@ -17,60 +16,55 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-dark); min-height: 100vh; overflow-x: hidden; }
+        body { background-color: var(--bg-color); color: var(--text-dark); min-height: 100vh; }
 
-        .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: var(--white); box-shadow: 5px 0 20px rgba(0,0,0,0.1); transition: var(--transition); z-index: 1000; padding: 40px 20px; }
-        .sidebar.active { left: 0; }
-        .sidebar h3 { color: var(--primary-color); margin-bottom: 30px; text-align: center; border-bottom: 2px solid var(--bg-color); padding-bottom: 10px; }
-        .sidebar-links { list-style: none; }
-        .sidebar-links li { margin: 15px 0; }
-        .sidebar-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; display: block; padding: 12px; border-radius: 8px; transition: var(--transition); }
-        .sidebar-links a:hover { background: var(--primary-color); color: var(--white); transform: translateX(-5px); }
-
+        /* Navigation */
         .navbar { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .menu-icon { cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
-        .menu-icon span { width: 30px; height: 3px; background-color: var(--primary-color); border-radius: 2px; }
         .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
 
-        .main-content { padding: 40px 20px; max-width: 600px; margin: 0 auto; text-align: center; }
+        /* Container */
+        .main-content { padding: 40px 20px; max-width: 800px; margin: 0 auto; text-align: center; }
         .screen { display: none; animation: slideUp 0.6s ease forwards; }
         .screen.active { display: block; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         h2 { margin-bottom: 30px; font-size: 1.8rem; color: var(--primary-color); }
-        .btn-list { display: flex; flex-direction: column; gap: 15px; }
-        .btn { background: var(--white); border: 2px solid transparent; padding: 18px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; color: var(--primary-color); cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: var(--transition); }
-        .btn:hover { border-color: var(--accent-color); transform: scale(1.02); }
-        .back-btn { margin-bottom: 20px; background: none; border: none; color: var(--text-dark); font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; z-index: 900; }
-        .overlay.active { display: block; }
+        .btn-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        
+        .btn { 
+            background: var(--white); border: 2px solid transparent; padding: 20px; 
+            border-radius: 15px; font-size: 1.1rem; font-weight: bold; 
+            color: var(--primary-color); cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: var(--transition); 
+        }
+        .btn:hover { border-color: var(--accent-color); transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        
+        .back-btn { margin-bottom: 20px; background: none; border: none; color: var(--primary-color); font-weight: bold; cursor: pointer; font-size: 1rem; display: block; }
 
-        /* تنسيق إضافي لمدخلات الروابط */
-        .input-group { margin-bottom: 20px; background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .custom-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.3s; }
-        .custom-input:focus { border-color: var(--primary-color); }
+        /* Files List Styles */
+        #files-list { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .file-card { 
+            background: var(--white); padding: 20px; border-radius: 15px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); border-right: 5px solid var(--primary-color);
+        }
+        .file-name { font-weight: 600; font-size: 1rem; color: var(--text-dark); text-align: right; }
+        .download-link { 
+            background: var(--primary-color); color: var(--white); 
+            padding: 10px 20px; border-radius: 10px; text-decoration: none; 
+            font-size: 0.9rem; font-weight: bold; transition: 0.3s;
+        }
+        .download-link:hover { background: var(--accent-color); color: var(--primary-color); }
+
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="sidebar" class="sidebar">
-        <h3>فريق النبراس</h3>
-        <ul class="sidebar-links">
-            <li><a href="#" onclick="toggleSidebar()">الرئيسية</a></li>
-            <li><a href="#" onclick="toggleSidebar()">عن الفريق</a></li>
-            <li><a href="#" onclick="toggleSidebar()">إنجازاتنا</a></li>
-            <li><a href="#" onclick="toggleSidebar()">تطوع معنا</a></li>
-            <li><a href="#" onclick="toggleSidebar()">اتصل بنا</a></li>
-        </ul>
-    </div>
-
-    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
-
     <nav class="navbar">
-        <div class="menu-icon" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
         <div class="logo">فريق النبراس التطوعي</div>
-        <div style="width: 30px;"></div> 
     </nav>
 
     <main class="main-content">
@@ -86,28 +80,28 @@
         </section>
 
         <section id="years-screen" class="screen">
-            <button class="back-btn" onclick="openSubjectScreen()"> &rarr; العودة للمواد</button>
-            <h2 id="subject-title">المادة المختارة</h2>
-            
-            <div class="input-group">
-                <input type="text" id="fileNameInput" class="custom-input" placeholder="اسم الملف (مثال: نوطة الوحدة الأولى)">
-                <input type="text" id="fileLinkInput" class="custom-input" placeholder="رابط الملف (Drive أو Telegram)">
-            </div>
-
+            <button class="back-btn" onclick="showScreen('subjects-screen')"> &rarr; العودة للمواد</button>
+            <h2 id="subject-title">المادة</h2>
             <div class="btn-list">
-                <button class="btn" onclick="saveToDatabase('2023')">حفظ في عام 2023</button>
-                <button class="btn" onclick="saveToDatabase('2024')">حفظ في عام 2024</button>
-                <button class="btn" onclick="saveToDatabase('2025')">حفظ في عام 2025</button>
-                <button class="btn" onclick="saveToDatabase('2026')">حفظ في عام 2026</button>
+                <button class="btn" onclick="loadFiles('2023')">2023</button>
+                <button class="btn" onclick="loadFiles('2024')">2024</button>
+                <button class="btn" onclick="loadFiles('2025')">2025</button>
+                <button class="btn" onclick="loadFiles('2026')">2026</button>
             </div>
+        </section>
+
+        <section id="files-screen" class="screen">
+            <button class="back-btn" onclick="showScreen('years-screen')"> &rarr; العودة للأعوام</button>
+            <h2 id="files-title">الملفات المتاحة</h2>
+            <div id="loader" class="loader"></div>
+            <div id="files-list"></div>
         </section>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // إعدادات مشروعك (تأكد أن databaseURL صحيحة)
         const firebaseConfig = {
             apiKey: "AIzaSyBZIfcH0HI0Nm3aXN8uoP4C6y49cF0Qvl4",
             authDomain: "al-nibras-bf98e.firebaseapp.com",
@@ -120,49 +114,53 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let currentSubject = "";
+        let selectedSubject = "";
 
-        window.toggleSidebar = function() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
-        }
-
-        window.openYearScreen = function(subjectName) {
-            currentSubject = subjectName;
-            document.getElementById('subjects-screen').classList.remove('active');
-            document.getElementById('years-screen').classList.add('active');
-            document.getElementById('subject-title').innerText = subjectName;
+        // تبديل الشاشات
+        window.showScreen = function(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        window.openSubjectScreen = function() {
-            document.getElementById('years-screen').classList.remove('active');
-            document.getElementById('subjects-screen').classList.add('active');
+        // اختيار المادة
+        window.openYearScreen = function(subject) {
+            selectedSubject = subject;
+            document.getElementById('subject-title').innerText = subject;
+            showScreen('years-screen');
         }
 
-        window.saveToDatabase = function(year) {
-            const fileUrl = document.getElementById('fileLinkInput').value;
-            const fileName = document.getElementById('fileNameInput').value;
+        // جلب الملفات من Firebase
+        window.loadFiles = function(year) {
+            document.getElementById('files-title').innerText = `${selectedSubject} - لعام ${year}`;
+            const listContainer = document.getElementById('files-list');
+            const loader = document.getElementById('loader');
+            
+            listContainer.innerHTML = "";
+            loader.style.display = "block";
+            showScreen('files-screen');
 
-            if (!fileUrl || !fileName) {
-                alert("يرجى إدخال اسم الملف والرابط");
-                return;
-            }
-
-            // المسار في قاعدة البيانات: nibras -> المادة -> السنة -> ملف فريد
-            const dbPath = ref(db, `nibras/${currentSubject}/${year}`);
-            const newFileRef = push(dbPath); 
-
-            set(newFileRef, {
-                name: fileName,
-                url: fileUrl,
-                date: new Date().toLocaleDateString('ar-SA')
-            }).then(() => {
-                alert("تمت الإضافة بنجاح للمنصة التعليمية!");
-                document.getElementById('fileLinkInput').value = "";
-                document.getElementById('fileNameInput').value = "";
-            }).catch((e) => {
-                alert("فشل الحفظ: " + e.message);
+            const filesRef = ref(db, `nibras/${selectedSubject}/${year}`);
+            
+            onValue(filesRef, (snapshot) => {
+                loader.style.display = "none";
+                const data = snapshot.val();
+                
+                if (data) {
+                    Object.keys(data).forEach(fileId => {
+                        const file = data[fileId];
+                        listContainer.innerHTML += `
+                            <div class="file-card">
+                                <div class="file-name">${file.name}</div>
+                                <a href="${file.url}" target="_blank" class="download-link">فتح الملف</a>
+                            </div>
+                        `;
+                    });
+                } else {
+                    listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات متوفرة حالياً لهذا العام.</p>";
+                }
+            }, {
+                onlyOnce: true
             });
         }
     </script>
