@@ -281,28 +281,87 @@
             document.getElementById('subjects-screen').classList.add('active');
         }
     </script>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBZIfcH0HI0Nm3aXN8uoP4C6y49cF0Qvl4",
-    authDomain: "al-nibras-bf98e.firebaseapp.com",
-    projectId: "al-nibras-bf98e",
-    storageBucket: "al-nibras-bf98e.firebasestorage.app",
-    messagingSenderId: "453402650871",
-    appId: "1:453402650871:web:092b37acf5c8575ec88bf2",
-    measurementId: "G-CS4PMVMF1W"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+‏// 1. استيراد المكتبات من CDN
+‏import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+‏import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+‏
+‏// 2. إعداداتك الخاصة (ضع الكود الذي نسخته هنا)
+‏// 1. استيراد المكتبات من CDN
+‏import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+‏import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+‏
+‏// 2. إعداداتك الخاصة (ضع الكود الذي نسخته هنا)
+‏const firebaseConfig = {
+‏    apiKey: "YOUR_API_KEY",
+‏    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+‏    projectId: "YOUR_PROJECT_ID",
+‏    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+‏    messagingSenderId: "YOUR_SENDER_ID",
+‏    appId: "YOUR_APP_ID"
+‏};
+‏
+‏// 3. تهيئة فايربيس
+‏const app = initializeApp(firebaseConfig);
+‏const storage = getStorage(app);
+‏
+‏// 4. دالة الرفع الاحترافية
+‏window.uploadToNibras = function(file, subject, year) {
+‏    if (!file) return;
+‏
+‏    // إنشاء مسار منظم: المواد/السنة/اسم_الملف
+‏    const storageRef = ref(storage, `نبراس/${subject}/${year}/${file.name}`);
+‏    const uploadTask = uploadBytesResumable(storageRef, file);
+‏
+‏    // مراقبة حالة الرفع
+‏    uploadTask.on('state_changed', 
+‏        (snapshot) => {
+‏            // هنا يمكنك حساب نسبة التقدم (Progress Bar) مستقبلاً
+‏            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+‏            console.log('نسبة الرفع: ' + progress + '%');
+‏        }, 
+‏        (error) => {
+‏            console.error("حدث خطأ:", error);
+‏            alert("فشل الرفع، تأكد من إعدادات الـ Rules في Firebase");
+‏        }, 
+‏        () => {
+‏            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+‏                alert("تم رفع الملف بنجاح إلى فريق النبراس!\nرابط الملف: " + downloadURL);
+‏            });
+‏        }
+‏    );
+‏};
+‏
+‏
+‏// 3. تهيئة فايربيس
+‏const app = initializeApp(firebaseConfig);
+‏const storage = getStorage(app);
+‏
+‏// 4. دالة الرفع الاحترافية
+‏window.uploadToNibras = function(file, subject, year) {
+‏    if (!file) return;
+‏
+‏    // إنشاء مسار منظم: المواد/السنة/اسم_الملف
+‏    const storageRef = ref(storage, `نبراس/${subject}/${year}/${file.name}`);
+‏    const uploadTask = uploadBytesResumable(storageRef, file);
+‏
+‏    // مراقبة حالة الرفع
+‏    uploadTask.on('state_changed', 
+‏        (snapshot) => {
+‏            // هنا يمكنك حساب نسبة التقدم (Progress Bar) مستقبلاً
+‏            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+‏            console.log('نسبة الرفع: ' + progress + '%');
+‏        }, 
+‏        (error) => {
+‏            console.error("حدث خطأ:", error);
+‏            alert("فشل الرفع، تأكد من إعدادات الـ Rules في Firebase");
+‏        }, 
+‏        () => {
+‏            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+‏                alert("تم رفع الملف بنجاح إلى فريق النبراس!\nرابط الملف: " + downloadURL);
+‏            });
+‏        }
+‏    );
+‏};
+‏
 </body>
 </html>
