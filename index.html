@@ -43,158 +43,160 @@
         .back-btn { margin-bottom: 20px; background: none; border: none; color: var(--primary-color); font-weight: bold; cursor: pointer; font-size: 1rem; display: block; }
 
         /* Files List Styles */
-        #files-list { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
-       /* حاوية الملفات */
-#files-list {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* مسافة بين البطاقات */
-    width: 100%;
-}
-
-/* بطاقة الملف */
-.file-card { 
-    background: var(--white); 
-    padding: 20px; 
-    border-radius: 15px; 
-    display: flex; 
-    flex-direction: column; /* ترتيب العناصر عمودياً في الموبايل */
-    align-items: center; 
-    gap: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
-    border-right: 6px solid var(--primary-color);
-    width: 100%; /* تأخذ كامل عرض الحاوية */
-    max-width: 100%; /* تمنع الخروج عن الشاشة */
-    box-sizing: border-box; /* لضمان حساب الـ padding ضمن العرض */
-}
-
-/* تنسيق الاسم ليظهر كاملاً */
-.file-name { 
-    font-weight: 600; 
-    font-size: 1.05rem; 
-    color: var(--text-dark); 
-    text-align: center; 
-    word-wrap: break-word; /* كسر الكلمات الطويلة جداً */
-    overflow-wrap: break-word;
-    width: 100%; /* ضمان استغلال كامل المساحة */
-    line-height: 1.6;
-}
-
-/* زر التحميل */
-.download-link { 
-    background: var(--primary-color); 
-    color: var(--white); 
-    padding: 12px 25px; 
-    border-radius: 10px; 
-    text-decoration: none; 
-    font-size: 0.95rem; 
-    font-weight: bold; 
-    transition: var(--transition);
-    width: auto; /* الزر يأخذ مساحة النص فقط */
-    min-width: 140px;
-    text-align: center;
-}
-
-/* تحسين العرض للشاشات الكبيرة (الكمبيوتر) */
-@media (min-width: 600px) {
-    .file-card {
-        flex-direction: row; /* العناصر بجانب بعضها في الشاشات الواسعة */
-        justify-content: space-between;
-        text-align: right;
-    }
-    .file-name {
-        text-align: right;
-    }
-}
+        #files-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
         }
+
+        /* بطاقة الملف */
+        .file-card { 
+            background: var(--white); 
+            padding: 20px; 
+            border-radius: 15px; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+            border-right: 6px solid var(--primary-color);
+            width: 100%; 
+            max-width: 100%; 
+            box-sizing: border-box; 
+        }
+
+        /* تنسيق الاسم ليظهر كاملاً */
+        .file-name { 
+            font-weight: 600; 
+            font-size: 1.05rem; 
+            color: var(--text-dark); 
+            text-align: center; 
+            word-wrap: break-word; 
+            overflow-wrap: break-word;
+            width: 100%; 
+            line-height: 1.6;
+        }
+
+        /* زر التحميل */
+        .download-link { 
+            background: var(--primary-color); 
+            color: var(--white); 
+            padding: 12px 25px; 
+            border-radius: 10px; 
+            text-decoration: none; 
+            font-size: 0.95rem; 
+            font-weight: bold; 
+            transition: var(--transition);
+            width: auto; 
+            min-width: 140px;
+            text-align: center;
+        }
+
+        /* تحسين العرض للشاشات الكبيرة */
+        @media (min-width: 600px) {
+            .file-card {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: right;
+            }
+            .file-name {
+                text-align: right;
+            }
+        }
+        
         .download-link:hover { background: var(--accent-color); color: var(--primary-color); }
 
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* --- 1. جعل القائمة الرئيسية عمودية --- */
-#subjects-screen .btn-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+        
+        /* 1. جعل القائمة الرئيسية عمودية */
+        #subjects-screen .btn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-#years-screen .btn-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 15px;
-}
+        #years-screen .btn-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
 
-/* --- 2. تعديل الشريط العلوي (الأيقونة على اليسار) --- */
-.navbar { 
-    display: flex; 
-    flex-direction: row-reverse; /* لعكس الترتيب في الشاشة العربية */
-    justify-content: space-between; 
-    align-items: center; 
-}
-.menu-icon { cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
-.menu-icon span { width: 30px; height: 4px; background-color: var(--primary-color); border-radius: 2px; }
+        /* 2. تعديل الشريط العلوي */
+        .navbar { 
+            display: flex; 
+            flex-direction: row-reverse;
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .menu-icon { cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
+        .menu-icon span { width: 30px; height: 4px; background-color: var(--primary-color); border-radius: 2px; }
 
-/* --- 3. اللمسة الفنية للقائمة الجانبية (على اليسار) --- */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: -320px; /* مخفية على اليسار */
-    width: 320px;
-    height: 100%;
-    background: linear-gradient(145deg, #ffffff 0%, #f1f2f6 100%);
-    box-shadow: 5px 0 25px rgba(0,0,0,0.15);
-    transition: var(--transition);
-    z-index: 1000;
-    padding: 30px 20px;
-    overflow-y: auto;
-    border-right: 4px solid var(--accent-color);
-}
-.sidebar.active { left: 0; }
-.sidebar-header { text-align: center; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 2px dashed #dcdde1; }
-.sidebar-header h3 { color: var(--primary-color); font-size: 1.5rem; font-weight: 900;}
+        /* 3. اللمسة الفنية للقائمة الجانبية */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100%;
+            background: linear-gradient(145deg, #ffffff 0%, #f1f2f6 100%);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.15);
+            transition: var(--transition);
+            z-index: 1000;
+            padding: 30px 20px;
+            overflow-y: auto;
+            border-right: 4px solid var(--accent-color);
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 2px dashed #dcdde1; }
+        .sidebar-header h3 { color: var(--primary-color); font-size: 1.5rem; font-weight: 900;}
 
-/* زر تسجيل الدخول */
-.login-btn {
-    display: block; width: 100%; text-align: center;
-    background: var(--accent-color); color: var(--primary-color);
-    padding: 15px; border-radius: 10px; font-weight: bold;
-    text-decoration: none; margin-bottom: 25px; transition: 0.3s;
-    box-shadow: 0 4px 10px rgba(246, 185, 59, 0.3);
-}
-.login-btn:hover { background: var(--primary-color); color: var(--white); transform: translateY(-3px); }
+        /* زر تسجيل الدخول */
+        .login-btn {
+            display: block; width: 100%; text-align: center;
+            background: var(--accent-color); color: var(--primary-color);
+            padding: 15px; border-radius: 10px; font-weight: bold;
+            text-decoration: none; margin-bottom: 25px; transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(246, 185, 59, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+        .login-btn:hover { background: var(--primary-color); color: var(--white); transform: translateY(-3px); }
 
-/* القوائم المنسدلة (Accordion) */
-.accordion-item { margin-bottom: 15px; border-radius: 12px; overflow: hidden; background: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.accordion-btn {
-    background: var(--white); color: var(--primary-color);
-    cursor: pointer; padding: 18px; width: 100%; border: none;
-    text-align: right; outline: none; font-size: 1rem; font-weight: bold;
-    transition: 0.4s; display: flex; justify-content: space-between; align-items: center;
-}
-.accordion-btn:hover, .accordion-btn.active { background: var(--primary-color); color: var(--white); }
-.accordion-btn::after { content: '\002B'; font-size: 1.5rem; transition: 0.3s; }
-.accordion-btn.active::after { content: '\2212'; transform: rotate(180deg); }
+        /* القوائم المنسدلة */
+        .accordion-item { margin-bottom: 15px; border-radius: 12px; overflow: hidden; background: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .accordion-btn {
+            background: var(--white); color: var(--primary-color);
+            cursor: pointer; padding: 18px; width: 100%; border: none;
+            text-align: right; outline: none; font-size: 1rem; font-weight: bold;
+            transition: 0.4s; display: flex; justify-content: space-between; align-items: center;
+        }
+        .accordion-btn:hover, .accordion-btn.active { background: var(--primary-color); color: var(--white); }
+        .accordion-btn::after { content: '\002B'; font-size: 1.5rem; transition: 0.3s; }
+        .accordion-btn.active::after { content: '\2212'; transform: rotate(180deg); }
 
-.accordion-content {
-    padding: 0 18px; background-color: #fafbfc;
-    max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;
-    font-size: 0.95rem; line-height: 1.8; color: var(--text-dark);
-}
-.accordion-content p { padding: 15px 0; }
-.accordion-content a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
+        .accordion-content {
+            padding: 0 18px; background-color: #fafbfc;
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;
+            font-size: 0.95rem; line-height: 1.8; color: var(--text-dark);
+        }
+        .accordion-content p { padding: 15px 0; }
+        .accordion-content a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
 
-.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 900; backdrop-filter: blur(3px); }
-.overlay.active { display: block; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 900; backdrop-filter: blur(3px); }
+        .overlay.active { display: block; }
+        
         /* تنسيق الأيقونات في بطاقة الملف */
-.file-actions { display: flex; align-items: center; gap: 15px; }
-.fav-btn { cursor: pointer; font-size: 1.6rem; user-select: none; transition: transform 0.2s; background: none; border: none; }
-.fav-btn:hover { transform: scale(1.2); }
-.viewed-badge { 
-    background: #2ed573; color: white; padding: 4px 10px; 
-    border-radius: 20px; font-size: 0.75rem; font-weight: bold; 
-    display: inline-flex; align-items: center; gap: 5px;
-}
+        .file-actions { display: flex; align-items: center; gap: 15px; }
+        .fav-btn { cursor: pointer; font-size: 1.6rem; user-select: none; transition: transform 0.2s; background: none; border: none; }
+        .fav-btn:hover { transform: scale(1.2); }
+        .viewed-badge { 
+            background: #2ed573; color: white; padding: 4px 10px; 
+            border-radius: 20px; font-size: 0.75rem; font-weight: bold; 
+            display: inline-flex; align-items: center; gap: 5px;
+        }
     </style>
 </head>
 <body>
@@ -286,22 +288,11 @@
     </main>
 
     <script type="module">
-       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// تهيئة Firebase (الكود الخاص بك يبقى كما هو هنا)
-const firebaseConfig = { ... };
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// إضافة هذه الأسطر لتهيئة المصادقة
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-let currentUser = null; // متغير لمعرفة المستخدم الحالي
-let userFavorites = {}; // لتخزين مفضلة المستخدم
-let userHistory = {};   // لتخزين سجل المستخدم
-
+        // تم إصلاح خطأ تكرار تعريف متغيرات Firebase هنا
         const firebaseConfig = {
             apiKey: "AIzaSyBZIfcH0HI0Nm3aXN8uoP4C6y49cF0Qvl4",
             authDomain: "al-nibras-bf98e.firebaseapp.com",
@@ -313,6 +304,12 @@ let userHistory = {};   // لتخزين سجل المستخدم
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentUser = null; 
+        let userFavorites = {}; 
+        let userHistory = {};  
 
         let selectedSubject = "";
 
@@ -330,157 +327,159 @@ let userHistory = {};   // لتخزين سجل المستخدم
             showScreen('years-screen');
         }
 
-     window.loadFiles = function(year) {
-    const listContainer = document.getElementById('files-list');
-    listContainer.innerHTML = "<p>جارٍ تحميل الملفات...</p>";
-    showScreen('files-screen');
-
-    // جرب هذا المسار (تأكد هل يوجد nibras في قاعدة بياناتك أم لا؟)
-    const path = `${selectedSubject}/${year}`; 
-    console.log("المسار الذي يتم البحث فيه حالياً هو: ", path);
-
-    const filesRef = ref(db, path);
-    
-   onValue(filesRef, (snapshot) => {
-    loader.style.display = "none";
-    const data = snapshot.val();
-    
-    if (data) {
-        Object.keys(data).forEach(fileId => {
-            const file = data[fileId];
+        window.loadFiles = function(year) {
+            const listContainer = document.getElementById('files-list');
+            const loader = document.getElementById('loader'); // تم إضافة تعريف الـ loader
             
-            // التحقق من حالة الملف للمستخدم الحالي
-            const isFav = userFavorites[fileId] ? '❤️' : '🤍';
-            const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
+            listContainer.innerHTML = ""; // تفريغ المحتوى القديم
+            loader.style.display = "block"; // إظهار التحميل
+            showScreen('files-screen');
+
+            const path = `${selectedSubject}/${year}`; 
+            console.log("المسار الذي يتم البحث فيه حالياً هو: ", path);
+
+            const filesRef = ref(db, path);
             
-            // حماية اسم الملف من الأقواس والاقتباسات عند تمريره للدوال
-            const safeName = file.name.replace(/'/g, "\\'");
+            onValue(filesRef, (snapshot) => {
+                loader.style.display = "none"; // إخفاء التحميل بعد الاستجابة
+                const data = snapshot.val();
+                
+                if (data) {
+                    Object.keys(data).forEach(fileId => {
+                        const file = data[fileId];
+                        
+                        const isFav = userFavorites[fileId] ? '❤️' : '🤍';
+                        const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
+                        
+                        const safeName = file.name.replace(/'/g, "\\'");
 
-            listContainer.innerHTML += `
-                <div class="file-card">
-                    <div class="file-name">${isViewed} ${file.name}</div>
-                    <div class="file-actions">
-                        <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
-                        <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">فتح الملف</a>
-                    </div>
-                </div>
-            `;
-        });
-    } else {
-        listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات متوفرة حالياً لهذا العام.</p>";
-    }
-}, { onlyOnce: true });
-        // فتح وإغلاق القائمة الجانبية
-window.toggleSidebar = function() {
-    document.getElementById('sidebar').classList.toggle('active');
-    document.getElementById('overlay').classList.toggle('active');
-}
-
-// تفعيل حركة القوائم المنسدلة (Accordion) بمرونة
-document.addEventListener('DOMContentLoaded', function() {
-    const acc = document.getElementsByClassName("accordion-btn");
-    for (let i = 0; i < acc.length; i++) {
-        acc[i].addEventListener("click", function() {
-            // إغلاق أي قائمة أخرى مفتوحة (اختياري لترتيب الشكل)
-            for (let j = 0; j < acc.length; j++) {
-                if (acc[j] !== this && acc[j].classList.contains("active")) {
-                    acc[j].classList.remove("active");
-                    acc[j].nextElementSibling.style.maxHeight = null;
+                        listContainer.innerHTML += `
+                            <div class="file-card">
+                                <div class="file-name">${isViewed} ${file.name}</div>
+                                <div class="file-actions">
+                                    <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
+                                    <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">فتح الملف</a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات متوفرة حالياً لهذا العام.</p>";
                 }
-            }
-            
-            // فتح أو إغلاق القائمة الحالية
-            this.classList.toggle("active");
-            const panel = this.nextElementSibling;
-            if (panel.style.maxHeight) {
-                panel.style.maxHeight = null;
-            } else {
-                panel.style.maxHeight = panel.scrollHeight + "px";
-            }
-        });
-    }
-});
+            }, { onlyOnce: true });
+        }
+
+        // فتح وإغلاق القائمة الجانبية
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        // تفعيل حركة القوائم المنسدلة (Accordion) 
+        // تم إزالة DOMContentLoaded لضمان عملها بشكل صحيح داخل الـ Module
+        const acc = document.getElementsByClassName("accordion-btn");
+        for (let i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                for (let j = 0; j < acc.length; j++) {
+                    if (acc[j] !== this && acc[j].classList.contains("active")) {
+                        acc[j].classList.remove("active");
+                        acc[j].nextElementSibling.style.maxHeight = null;
+                    }
+                }
+                
+                this.classList.toggle("active");
+                const panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+
         // 1. دوال تسجيل الدخول والخروج
-window.signInWithGoogle = function() {
-    signInWithPopup(auth, provider).catch(error => alert("حدث خطأ أثناء تسجيل الدخول: " + error.message));
-}
-window.logout = function() { signOut(auth); }
+        window.signInWithGoogle = function() {
+            signInWithPopup(auth, provider).catch(error => alert("حدث خطأ أثناء تسجيل الدخول: " + error.message));
+        }
+        window.logout = function() { signOut(auth); }
 
-// 2. مراقبة حالة تسجيل الدخول
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser = user;
-        document.getElementById('login-btn').style.display = 'none';
-        document.getElementById('user-profile').style.display = 'block';
-        document.getElementById('user-menu').style.display = 'flex';
-        document.getElementById('user-pic').src = user.photoURL;
-        document.getElementById('user-name').innerText = user.displayName;
-        
-        // جلب بيانات المفضلة والسجل للمستخدم من Firebase
-        const userRef = ref(db, `users/${user.uid}`);
-        onValue(userRef, (snapshot) => {
-            const data = snapshot.val() || {};
-            userFavorites = data.favorites || {};
-            userHistory = data.history || {};
-            
-            // إعادة رسم الشاشة الحالية لتحديث القلوب وعلامة العرض
-            if(document.getElementById('files-screen').classList.contains('active')) {
-                const currentYear = document.getElementById('files-title').innerText.split(' - لعام ')[1];
-                if(currentYear) window.loadFiles(currentYear);
+        // 2. مراقبة حالة تسجيل الدخول
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('user-profile').style.display = 'block';
+                document.getElementById('user-menu').style.display = 'flex';
+                document.getElementById('user-pic').src = user.photoURL;
+                document.getElementById('user-name').innerText = user.displayName;
+                
+                const userRef = ref(db, `users/${user.uid}`);
+                onValue(userRef, (snapshot) => {
+                    const data = snapshot.val() || {};
+                    userFavorites = data.favorites || {};
+                    userHistory = data.history || {};
+                    
+                    if(document.getElementById('files-screen').classList.contains('active')) {
+                        const currentYearTitle = document.getElementById('files-title').innerText;
+                        // تحقق بسيط لضمان عدم حدوث خطأ عند جلب السنة
+                        if(currentYearTitle.includes('لعام')) {
+                            const currentYear = currentYearTitle.split(' - لعام ')[1];
+                            if(currentYear) window.loadFiles(currentYear);
+                        }
+                    }
+                });
+            } else {
+                currentUser = null; userFavorites = {}; userHistory = {};
+                document.getElementById('login-btn').style.display = 'block';
+                document.getElementById('user-profile').style.display = 'none';
+                document.getElementById('user-menu').style.display = 'none';
             }
         });
-    } else {
-        currentUser = null; userFavorites = {}; userHistory = {};
-        document.getElementById('login-btn').style.display = 'block';
-        document.getElementById('user-profile').style.display = 'none';
-        document.getElementById('user-menu').style.display = 'none';
-    }
-});
 
-// 3. دالة إضافة/إزالة المفضلة
-window.toggleFavorite = function(fileId, fileName, fileUrl) {
-    if (!currentUser) { alert("يرجى تسجيل الدخول أولاً لإضافة الملفات للمفضلة."); return; }
-    const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
-    if (userFavorites[fileId]) { remove(favRef); } // إذا كان موجوداً، احذفه
-    else { set(favRef, { name: fileName, url: fileUrl }); } // إذا لم يكن موجوداً، أضفه
-}
+        // 3. دالة إضافة/إزالة المفضلة
+        window.toggleFavorite = function(fileId, fileName, fileUrl) {
+            if (!currentUser) { alert("يرجى تسجيل الدخول أولاً لإضافة الملفات للمفضلة."); return; }
+            const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
+            if (userFavorites[fileId]) { remove(favRef); } 
+            else { set(favRef, { name: fileName, url: fileUrl }); } 
+        }
 
-// 4. دالة تسجيل أن الملف تم فتحه (السجل)
-window.markAsViewed = function(fileId, fileName, fileUrl) {
-    if (!currentUser) return; // لا نسجل شيء للزوار غير المسجلين
-    const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
-    set(historyRef, { name: fileName, url: fileUrl, timestamp: Date.now() });
-}
+        // 4. دالة تسجيل أن الملف تم فتحه (السجل)
+        window.markAsViewed = function(fileId, fileName, fileUrl) {
+            if (!currentUser) return; 
+            const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
+            set(historyRef, { name: fileName, url: fileUrl, timestamp: Date.now() });
+        }
 
-// 5. دالة عرض المفضلة أو السجل في الشاشة
-window.showUserFiles = function(type) {
-    toggleSidebar(); // إغلاق القائمة الجانبية
-    const listContainer = document.getElementById('files-list');
-    listContainer.innerHTML = "";
-    document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل المشاهدات';
-    showScreen('files-screen');
+        // 5. دالة عرض المفضلة أو السجل في الشاشة
+        window.showUserFiles = function(type) {
+            toggleSidebar(); 
+            const listContainer = document.getElementById('files-list');
+            listContainer.innerHTML = "";
+            document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل المشاهدات';
+            showScreen('files-screen');
 
-    const data = type === 'favorites' ? userFavorites : userHistory;
-    if (Object.keys(data).length > 0) {
-        Object.keys(data).forEach(fileId => {
-            const file = data[fileId];
-            const isFav = userFavorites[fileId] ? '❤️' : '🤍';
-            const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
-            
-            listContainer.innerHTML += `
-                <div class="file-card">
-                    <div class="file-name">${isViewed} ${file.name}</div>
-                    <div class="file-actions">
-                        <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${file.name.replace(/'/g, "\\'")}', '${file.url}')">${isFav}</button>
-                        <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${file.name.replace(/'/g, "\\'")}', '${file.url}')">فتح الملف</a>
-                    </div>
-                </div>
-            `;
-        });
-    } else {
-        listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
-    }
-}
+            const data = type === 'favorites' ? userFavorites : userHistory;
+            if (Object.keys(data).length > 0) {
+                Object.keys(data).forEach(fileId => {
+                    const file = data[fileId];
+                    const isFav = userFavorites[fileId] ? '❤️' : '🤍';
+                    const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
+                    
+                    listContainer.innerHTML += `
+                        <div class="file-card">
+                            <div class="file-name">${isViewed} ${file.name}</div>
+                            <div class="file-actions">
+                                <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${file.name.replace(/'/g, "\\'")}', '${file.url}')">${isFav}</button>
+                                <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${file.name.replace(/'/g, "\\'")}', '${file.url}')">فتح الملف</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
+            }
+        }
     </script>
 </body>
 </html>
