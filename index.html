@@ -281,5 +281,28 @@
             document.getElementById('subjects-screen').classList.add('active');
         }
     </script>
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZIfcH0HI0Nm3aXN8uoP4C6y49cF0Qvl4",
+    authDomain: "al-nibras-bf98e.firebaseapp.com",
+    projectId: "al-nibras-bf98e",
+    storageBucket: "al-nibras-bf98e.firebasestorage.app",
+    messagingSenderId: "453402650871",
+    appId: "1:453402650871:web:092b37acf5c8575ec88bf2",
+    measurementId: "G-CS4PMVMF1W"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
