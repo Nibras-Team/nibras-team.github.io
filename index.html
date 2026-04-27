@@ -197,6 +197,31 @@
             border-radius: 20px; font-size: 0.75rem; font-weight: bold; 
             display: inline-flex; align-items: center; gap: 5px;
         }
+        /* تنسيقات أيقونات البار العلوي وشريط البحث */
+.nav-actions { display: flex; gap: 12px; align-items: center; }
+.nav-icon { 
+    cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; 
+    width: 38px; height: 38px; border-radius: 50%; background: var(--bg-color); 
+    transition: var(--transition); color: var(--primary-color); border: none; outline: none;
+}
+.nav-icon:hover { background: var(--accent-color); color: var(--white); transform: scale(1.1); }
+.nav-icon svg { width: 22px; height: 22px; fill: currentColor; }
+
+#search-bar-container { 
+    display: none; padding: 15px 5%; background: var(--white); 
+    border-top: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+}
+#search-bar-container.active { display: flex; gap: 10px; }
+#search-input { 
+    flex: 1; padding: 12px 15px; border: 2px solid #ddd; 
+    border-radius: 10px; outline: none; font-size: 1rem; transition: 0.3s;
+}
+#search-input:focus { border-color: var(--primary-color); }
+#search-btn { 
+    padding: 10px 20px; background: var(--primary-color); color: white; 
+    border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s;
+}
+#search-btn:hover { background: var(--accent-color); color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -250,10 +275,27 @@
 </div>
 
 <nav class="navbar">
-    <div class="logo">فريق النبراس التطوعي</div>
+  <nav class="navbar">
+    <div class="logo">فريق النبراس</div>
+    
+    <div class="nav-actions">
+        <a href="https://t.me/NibrasInstituteBot" target="_blank" class="nav-icon" title="بوت النبراس">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.96 1.25-5.54 3.67-.52.36-.99.54-1.41.53-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.23.36-.48.98-.75 3.84-1.67 6.4-2.78 7.68-3.32 3.65-1.53 4.41-1.8 4.9-1.81.11 0 .36.03.5.15.11.1.15.23.16.35-.01.06-.01.12-.02.24z"/></svg>
+        </a>
+        <button class="nav-icon" onclick="toggleSearchBar()" title="بحث">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </button>
+    </div>
+
     <div class="menu-icon" onclick="toggleSidebar()">
         <span></span><span></span><span></span>
     </div>
+</nav>
+
+<div id="search-bar-container">
+    <input type="text" id="search-input" placeholder="ابحث عن اسم الملف هنا..." onkeyup="if(event.key === 'Enter') executeSearch()">
+    <button id="search-btn" onclick="executeSearch()">بحث</button>
+</div>
 </nav>
 
     <main class="main-content">
@@ -280,7 +322,7 @@
         </section>
 
         <section id="files-screen" class="screen">
-            <button class="back-btn" onclick="showScreen('years-screen')"> &rarr; العودة للأعوام</button>
+            <button id="dynamic-back-btn" class="back-btn" onclick="showScreen('years-screen')"> &rarr; العودة للأعوام</button>
             <h2 id="files-title">الملفات المتاحة</h2>
             <div id="loader" class="loader"></div>
             <div id="files-list"></div>
@@ -328,6 +370,9 @@
         }
 
         window.loadFiles = function(year) {
+            // لضمان أن زر العودة يعود للأعوام عند تصفح الملفات العادية
+document.getElementById('dynamic-back-btn').onclick = function() { showScreen('years-screen'); };
+document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للأعوام";
             const listContainer = document.getElementById('files-list');
             const loader = document.getElementById('loader'); // تم إضافة تعريف الـ loader
             
@@ -453,6 +498,9 @@
 
         // 5. دالة عرض المفضلة أو السجل في الشاشة
         window.showUserFiles = function(type) {
+            // لضمان أن زر العودة يعود للرئيسية عند تصفح المفضلة أو السجل
+document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
+document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
             toggleSidebar(); 
             const listContainer = document.getElementById('files-list');
             listContainer.innerHTML = "";
@@ -480,6 +528,80 @@
                 listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
             }
         }
+        // دالة إظهار وإخفاء شريط البحث
+window.toggleSearchBar = function() {
+    document.getElementById('search-bar-container').classList.toggle('active');
+    if (document.getElementById('search-bar-container').classList.contains('active')) {
+        document.getElementById('search-input').focus();
+    }
+}
+
+// دالة البحث الشامل في قاعدة البيانات
+window.executeSearch = function() {
+    const query = document.getElementById('search-input').value.trim().toLowerCase();
+    if(!query) return;
+
+    const listContainer = document.getElementById('files-list');
+    const loader = document.getElementById('loader');
+    
+    listContainer.innerHTML = ""; 
+    loader.style.display = "block"; 
+    
+    // ضبط زر العودة ليرجع للرئيسية
+    document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
+    document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
+    document.getElementById('files-title').innerText = "نتائج البحث عن: " + query;
+    
+    showScreen('files-screen');
+    document.getElementById('search-bar-container').classList.remove('active'); // إخفاء شريط البحث بعد بدء البحث
+
+    // جلب كل البيانات من Firebase والبحث فيها
+    const dbRef = ref(db, '/');
+    onValue(dbRef, (snapshot) => {
+        loader.style.display = "none";
+        const allData = snapshot.val();
+        let resultsFound = false;
+
+        if (allData) {
+            Object.keys(allData).forEach(subject => {
+                if (subject === 'users') return; // تخطي بيانات المستخدمين الخاصة
+                
+                const years = allData[subject];
+                Object.keys(years).forEach(year => {
+                    const files = years[year];
+                    Object.keys(files).forEach(fileId => {
+                        const file = files[fileId];
+                        
+                        // إذا كان اسم الملف يحتوي على نص البحث
+                        if (file.name && file.name.toLowerCase().includes(query)) {
+                            resultsFound = true;
+                            const isFav = userFavorites[fileId] ? '❤️' : '🤍';
+                            const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
+                            const safeName = file.name.replace(/'/g, "\\'");
+
+                            listContainer.innerHTML += `
+                                <div class="file-card">
+                                    <div class="file-name">
+                                        <span style="font-size: 0.8rem; color: var(--primary-color); display: block; margin-bottom: 5px;">${subject} - ${year}</span>
+                                        ${isViewed} ${file.name}
+                                    </div>
+                                    <div class="file-actions">
+                                        <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
+                                        <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">فتح الملف</a>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                });
+            });
+        }
+
+        if (!resultsFound) {
+            listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لم يتم العثور على ملفات تطابق بحثك.</p>";
+        }
+    }, { onlyOnce: true });
+}
     </script>
 </body>
 </html>
