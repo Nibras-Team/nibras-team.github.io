@@ -186,6 +186,15 @@
 
 .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 900; backdrop-filter: blur(3px); }
 .overlay.active { display: block; }
+        /* تنسيق الأيقونات في بطاقة الملف */
+.file-actions { display: flex; align-items: center; gap: 15px; }
+.fav-btn { cursor: pointer; font-size: 1.6rem; user-select: none; transition: transform 0.2s; background: none; border: none; }
+.fav-btn:hover { transform: scale(1.2); }
+.viewed-badge { 
+    background: #2ed573; color: white; padding: 4px 10px; 
+    border-radius: 20px; font-size: 0.75rem; font-weight: bold; 
+    display: inline-flex; align-items: center; gap: 5px;
+}
     </style>
 </head>
 <body>
@@ -197,7 +206,20 @@
         <h3>فريق النبراس</h3>
     </div>
     
-    <a href="#" class="login-btn">تسجيل الدخول للاحتفاظ بالتقدم</a>
+   <div id="auth-section">
+    <button id="login-btn" class="login-btn" onclick="signInWithGoogle()">تسجيل الدخول عبر Google</button>
+    
+    <div id="user-profile" style="display: none; text-align: center; margin-bottom: 20px;">
+        <img id="user-pic" src="" alt="صورة الحساب" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--primary-color); object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h4 id="user-name" style="margin-top: 10px; color: var(--primary-color); font-weight: bold;"></h4>
+    </div>
+
+    <div id="user-menu" style="display: none; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+        <button class="btn" style="padding: 12px; font-size: 1rem; border-color: #ff4757; color: #ff4757;" onclick="showUserFiles('favorites')">المفضلة 🤍</button>
+        <button class="btn" style="padding: 12px; font-size: 1rem; border-color: #2ed573; color: #2ed573;" onclick="showUserFiles('history')">السجل 🕒</button>
+        <button class="btn" style="padding: 12px; font-size: 1rem; background: #ff4757; color: white; border: none;" onclick="logout()">تسجيل الخروج</button>
+    </div>
+</div>
 
     <div class="accordion-item">
         <button class="accordion-btn">نبذة عن الفريق</button>
@@ -264,8 +286,21 @@
     </main>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// تهيئة Firebase (الكود الخاص بك يبقى كما هو هنا)
+const firebaseConfig = { ... };
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// إضافة هذه الأسطر لتهيئة المصادقة
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+let currentUser = null; // متغير لمعرفة المستخدم الحالي
+let userFavorites = {}; // لتخزين مفضلة المستخدم
+let userHistory = {};   // لتخزين سجل المستخدم
 
         const firebaseConfig = {
             apiKey: "AIzaSyBZIfcH0HI0Nm3aXN8uoP4C6y49cF0Qvl4",
@@ -306,25 +341,35 @@
 
     const filesRef = ref(db, path);
     
-    onValue(filesRef, (snapshot) => {
-        const data = snapshot.val();
-        console.log("البيانات التي وصلت من Firebase: ", data); // راقب الـ Console هنا
+   onValue(filesRef, (snapshot) => {
+    loader.style.display = "none";
+    const data = snapshot.val();
+    
+    if (data) {
+        Object.keys(data).forEach(fileId => {
+            const file = data[fileId];
+            
+            // التحقق من حالة الملف للمستخدم الحالي
+            const isFav = userFavorites[fileId] ? '❤️' : '🤍';
+            const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
+            
+            // حماية اسم الملف من الأقواس والاقتباسات عند تمريره للدوال
+            const safeName = file.name.replace(/'/g, "\\'");
 
-        if (data) {
-            listContainer.innerHTML = "";
-            Object.values(data).forEach(file => {
-                listContainer.innerHTML += `
-                    <div class="file-card">
-                        <div class="file-name">${file.name}</div>
-                        <a href="${file.url}" target="_blank" class="download-link">فتح الملف</a>
+            listContainer.innerHTML += `
+                <div class="file-card">
+                    <div class="file-name">${isViewed} ${file.name}</div>
+                    <div class="file-actions">
+                        <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
+                        <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">فتح الملف</a>
                     </div>
-                `;
-            });
-        } else {
-            listContainer.innerHTML = `<p>لم يتم العثور على بيانات في المسار: ${path}</p>`;
-        }
-    }, { onlyOnce: true });
-}
+                </div>
+            `;
+        });
+    } else {
+        listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات متوفرة حالياً لهذا العام.</p>";
+    }
+}, { onlyOnce: true });
         // فتح وإغلاق القائمة الجانبية
 window.toggleSidebar = function() {
     document.getElementById('sidebar').classList.toggle('active');
@@ -355,6 +400,87 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+        // 1. دوال تسجيل الدخول والخروج
+window.signInWithGoogle = function() {
+    signInWithPopup(auth, provider).catch(error => alert("حدث خطأ أثناء تسجيل الدخول: " + error.message));
+}
+window.logout = function() { signOut(auth); }
+
+// 2. مراقبة حالة تسجيل الدخول
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = user;
+        document.getElementById('login-btn').style.display = 'none';
+        document.getElementById('user-profile').style.display = 'block';
+        document.getElementById('user-menu').style.display = 'flex';
+        document.getElementById('user-pic').src = user.photoURL;
+        document.getElementById('user-name').innerText = user.displayName;
+        
+        // جلب بيانات المفضلة والسجل للمستخدم من Firebase
+        const userRef = ref(db, `users/${user.uid}`);
+        onValue(userRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            userFavorites = data.favorites || {};
+            userHistory = data.history || {};
+            
+            // إعادة رسم الشاشة الحالية لتحديث القلوب وعلامة العرض
+            if(document.getElementById('files-screen').classList.contains('active')) {
+                const currentYear = document.getElementById('files-title').innerText.split(' - لعام ')[1];
+                if(currentYear) window.loadFiles(currentYear);
+            }
+        });
+    } else {
+        currentUser = null; userFavorites = {}; userHistory = {};
+        document.getElementById('login-btn').style.display = 'block';
+        document.getElementById('user-profile').style.display = 'none';
+        document.getElementById('user-menu').style.display = 'none';
+    }
+});
+
+// 3. دالة إضافة/إزالة المفضلة
+window.toggleFavorite = function(fileId, fileName, fileUrl) {
+    if (!currentUser) { alert("يرجى تسجيل الدخول أولاً لإضافة الملفات للمفضلة."); return; }
+    const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
+    if (userFavorites[fileId]) { remove(favRef); } // إذا كان موجوداً، احذفه
+    else { set(favRef, { name: fileName, url: fileUrl }); } // إذا لم يكن موجوداً، أضفه
+}
+
+// 4. دالة تسجيل أن الملف تم فتحه (السجل)
+window.markAsViewed = function(fileId, fileName, fileUrl) {
+    if (!currentUser) return; // لا نسجل شيء للزوار غير المسجلين
+    const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
+    set(historyRef, { name: fileName, url: fileUrl, timestamp: Date.now() });
+}
+
+// 5. دالة عرض المفضلة أو السجل في الشاشة
+window.showUserFiles = function(type) {
+    toggleSidebar(); // إغلاق القائمة الجانبية
+    const listContainer = document.getElementById('files-list');
+    listContainer.innerHTML = "";
+    document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل المشاهدات';
+    showScreen('files-screen');
+
+    const data = type === 'favorites' ? userFavorites : userHistory;
+    if (Object.keys(data).length > 0) {
+        Object.keys(data).forEach(fileId => {
+            const file = data[fileId];
+            const isFav = userFavorites[fileId] ? '❤️' : '🤍';
+            const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
+            
+            listContainer.innerHTML += `
+                <div class="file-card">
+                    <div class="file-name">${isViewed} ${file.name}</div>
+                    <div class="file-actions">
+                        <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${file.name.replace(/'/g, "\\'")}', '${file.url}')">${isFav}</button>
+                        <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${file.name.replace(/'/g, "\\'")}', '${file.url}')">فتح الملف</a>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
+    }
+}
     </script>
 </body>
 </html>
