@@ -335,8 +335,7 @@
     </main>
 
     <script type="module">
-        // تمت إضافة دالة get للاستخدام في البحث لمرة واحدة وتفادي المشاكل
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -360,17 +359,15 @@
 
         let selectedSubject = "";
 
-     
-window.showScreen = function(screenId, pushToHistory = true) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-    window.scrollTo({top: 0, behavior: 'smooth'});
+        window.showScreen = function(screenId, pushToHistory = true) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
 
-    // إذا كان الانتقال جديداً (وليس ناتجاً عن ضغط زر الرجوع)، نحفظه في التاريخ
-    if (pushToHistory) {
-        history.pushState({ screen: screenId }, "", "#" + screenId);
-    }
-}
+            if (pushToHistory) {
+                history.pushState({ screen: screenId }, "", "#" + screenId);
+            }
+        }
 
         window.openYearScreen = function(subject) {
             selectedSubject = subject;
@@ -382,7 +379,6 @@ window.showScreen = function(screenId, pushToHistory = true) {
             const listContainer = document.getElementById('files-list');
             const loader = document.getElementById('loader'); 
             
-            // ضبط زر العودة للأعوام
             document.getElementById('dynamic-back-btn').onclick = function() { showScreen('years-screen'); };
             document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للأعوام";
             document.getElementById('files-title').innerText = selectedSubject + " - لعام " + year;
@@ -405,21 +401,21 @@ window.showScreen = function(screenId, pushToHistory = true) {
                         const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
                         const safeName = file.name.replace(/'/g, "\\'");
 
-        listContainer.innerHTML += `
-    <div class="file-card">
-        <div class="file-name" id="name-${fileId}">
-            ${isViewed} ${file.name}
-        </div>
-        <div class="file-actions">
-            <button class="fav-btn" id="fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">
-                ${isFav}
-            </button>
-            <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">
-                فتح الملف
-            </a>
-        </div>
-    </div>
-`;
+                        listContainer.innerHTML += `
+                            <div class="file-card" id="card-${fileId}">
+                                <div class="file-name" id="name-${fileId}">
+                                    ${isViewed} ${file.name}
+                                </div>
+                                <div class="file-actions">
+                                    <button class="fav-btn fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">
+                                        ${isFav}
+                                    </button>
+                                    <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">
+                                        فتح الملف
+                                    </a>
+                                </div>
+                            </div>
+                        `;
                     });
                 } else {
                     listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات متوفرة حالياً لهذا العام.</p>";
@@ -427,8 +423,7 @@ window.showScreen = function(screenId, pushToHistory = true) {
             }, { onlyOnce: true });
         }
 
-        // --- دالة البحث المحسنة باستخدام get للتعامل مع الأخطاء وإيقاف الدوران اللانهائي ---
-window.executeSearch = function() {
+        window.executeSearch = function() {
             const query = document.getElementById('search-input').value.trim().toLowerCase();
             if(!query) return;
 
@@ -438,7 +433,6 @@ window.executeSearch = function() {
             listContainer.innerHTML = ""; 
             loader.style.display = "block"; 
             
-            // ضبط زر العودة للرئيسية
             document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
             document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
             document.getElementById('files-title').innerText = "نتائج البحث عن: " + query;
@@ -446,7 +440,6 @@ window.executeSearch = function() {
             showScreen('files-screen');
 
             const dbRef = ref(db, '/');
-            // استخدمنا get بدلاً من onValue لالتقاط الخطأ بشكل صحيح في حال حدوثه
             get(dbRef).then((snapshot) => {
                 loader.style.display = "none";
                 const allData = snapshot.val();
@@ -454,10 +447,10 @@ window.executeSearch = function() {
 
                 if (allData) {
                     Object.keys(allData).forEach(subject => {
-                        if (subject === 'users') return; // تخطي مجلد المستخدمين الخاص
+                        if (subject === 'users') return; 
                         
                         const years = allData[subject];
-                        if (typeof years !== 'object') return; // لتجنب الأخطاء إذا كانت البيانات نصية
+                        if (typeof years !== 'object') return; 
 
                         Object.keys(years).forEach(year => {
                             const files = years[year];
@@ -473,13 +466,13 @@ window.executeSearch = function() {
                                     const safeName = file.name.replace(/'/g, "\\'");
 
                                     listContainer.innerHTML += `
-                                        <div class="file-card">
-                                            <div class="file-name">
+                                        <div class="file-card" id="card-${fileId}">
+                                            <div class="file-name" id="name-${fileId}">
                                                 <span style="font-size: 0.8rem; color: var(--primary-color); display: block; margin-bottom: 5px;">${subject} - ${year}</span>
                                                 ${isViewed} ${file.name}
                                             </div>
                                             <div class="file-actions">
-                                                <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
+                                                <button class="fav-btn fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
                                                 <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">فتح الملف</a>
                                             </div>
                                         </div>
@@ -494,7 +487,6 @@ window.executeSearch = function() {
                     listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لم يتم العثور على ملفات تطابق بحثك.</p>";
                 }
             }).catch((error) => {
-                // إيقاف التحميل وإظهار رسالة خطأ واضحة
                 loader.style.display = "none";
                 listContainer.innerHTML = `<p style='padding:20px; color:red; font-weight:bold;'>حدث خطأ أثناء البحث. يرجى التحقق من اتصالك بالإنترنت.</p>`;
                 console.error("خطأ في البحث:", error);
@@ -554,165 +546,142 @@ window.executeSearch = function() {
             }
         });
 
-      window.toggleFavorite = function(fileId, fileName, fileUrl) {
-    if (!currentUser) { 
-        showLoginPopup(); // إظهار النافذة الزجاجية بدلاً من alert
-        return; 
-    }
-    
-    const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
-    
-    // البحث عن كل القلوب التي تحمل هذا الـ ID في أي مكان في الموقع (بحث، سجل، مفضلة)
-    const favIcons = document.querySelectorAll(`.fav-icon-${fileId}`);
+        window.toggleFavorite = function(fileId, fileName, fileUrl) {
+            if (!currentUser) { 
+                showLoginPopup(); 
+                return; 
+            }
+            
+            const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
+            const favIcons = document.querySelectorAll(`.fav-icon-${fileId}`);
 
-    if (userFavorites[fileId]) { 
-        // 1. الإزالة من قاعدة البيانات
-        remove(favRef);
-        delete userFavorites[fileId]; // تحديث المتغير المحلي
-        
-        // 2. التحديث اللحظي لكل القلوب لتصبح بيضاء
-        favIcons.forEach(icon => icon.innerText = '🤍');
+            if (userFavorites[fileId]) { 
+                remove(favRef);
+                delete userFavorites[fileId]; 
+                
+                favIcons.forEach(icon => icon.innerText = '🤍');
 
-        // 3. إذا كنا داخل قائمة المفضلة، نحذف البطاقة فوراً وبشكل حركي
-        const cardToHide = document.getElementById(`card-${fileId}`);
-        if (cardToHide && document.getElementById('favorites-screen').classList.contains('active')) {
-            cardToHide.style.display = 'none'; // إخفاء فوري
+                const cardToHide = document.getElementById(`card-${fileId}`);
+                if (cardToHide && document.getElementById('files-title').innerText === 'ملفاتي المفضلة') {
+                    cardToHide.style.display = 'none'; 
+                }
+            } 
+            else { 
+                set(favRef, { name: fileName, url: fileUrl });
+                userFavorites[fileId] = true;
+                
+                favIcons.forEach(icon => icon.innerText = '❤️');
+            } 
         }
-    } 
-    else { 
-        // 1. الإضافة لقاعدة البيانات
-        set(favRef, { name: fileName, url: fileUrl });
-        userFavorites[fileId] = true;
-        
-        // 2. التحديث اللحظي لكل القلوب لتصبح حمراء
-        favIcons.forEach(icon => icon.innerText = '❤️');
-    } 
-}
 
         window.markAsViewed = function(fileId, fileName, fileUrl) {
             if (!currentUser) return; 
+
             const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
             set(historyRef, { name: fileName, url: fileUrl, timestamp: Date.now() });
+
+            const nameContainer = document.getElementById(`name-${fileId}`);
+            if (nameContainer && !nameContainer.innerHTML.includes('viewed-badge')) {
+                nameContainer.innerHTML = `<span class="viewed-badge">✓ تم العرض</span> ` + nameContainer.innerHTML;
+            }
         }
 
-window.showUserFiles = function(type) {
-    toggleSidebar(); 
-    const listContainer = document.getElementById('files-list');
-    listContainer.innerHTML = "";
-    
-    // ضبط العنوان بناءً على النوع
-    document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل الملفات المعروضة';
-    
-    // ضبط زر العودة للرئيسية
-    document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
-    document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
-
-    showScreen('files-screen');
-
-    let data = type === 'favorites' ? userFavorites : userHistory;
-    
-    if (Object.keys(data).length > 0) {
-        // تحويل البيانات إلى مصفوفة للتمكن من ترتيبها
-        let itemsArray = Object.keys(data).map(fileId => {
-            return { id: fileId, ...data[fileId] };
-        });
-
-        // إذا كنا في السجل، نرتب من الأحدث للأقدم بناءً على الـ timestamp
-        if (type === 'history') {
-            itemsArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        }
-
-        itemsArray.forEach(file => {
-            const fileId = file.id;
-            const isFav = userFavorites[fileId] ? '❤️' : '🤍';
-            const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
-            const safeName = file.name.replace(/'/g, "\\'");
+        // دالة الحذف من السجل الجديدة
+        window.removeFromHistory = function(fileId) {
+            if (!currentUser) return;
+            const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
             
-            // إضافة زر الحذف فقط إذا كنا في قائمة السجل
-            const deleteButton = type === 'history' 
-                ? `<button class="delete-btn" title="حذف من السجل" onclick="removeFromHistory('${fileId}')">🗑️</button>` 
-                : '';
+            remove(historyRef).then(() => {
+                delete userHistory[fileId]; 
+                const cardToRemove = document.getElementById(`card-${fileId}`);
+                if (cardToRemove) {
+                    cardToRemove.style.display = 'none'; 
+                }
+            }).catch((error) => {
+                console.error("حدث خطأ أثناء الحذف:", error);
+            });
+        }
 
-            listContainer.innerHTML += `
-                <div class="file-card" id="card-${fileId}">
-                    <div class="file-name" id="name-${fileId}">${isViewed} ${file.name}</div>
-                    <div class="file-actions">
-                        ${deleteButton}
-                        <button class="fav-btn fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">
-                            ${isFav}
-                        </button>
-                        <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">
-                            فتح الملف
-                        </a>
-                    </div>
-                </div>
-            `;
+        window.showUserFiles = function(type) {
+            toggleSidebar(); 
+            const listContainer = document.getElementById('files-list');
+            listContainer.innerHTML = "";
+            
+            document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل الملفات المعروضة';
+            
+            document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
+            document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
+
+            showScreen('files-screen');
+
+            let data = type === 'favorites' ? userFavorites : userHistory;
+            
+            if (Object.keys(data).length > 0) {
+                let itemsArray = Object.keys(data).map(fileId => {
+                    return { id: fileId, ...data[fileId] };
+                });
+
+                if (type === 'history') {
+                    itemsArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                }
+
+                itemsArray.forEach(file => {
+                    const fileId = file.id;
+                    const isFav = userFavorites[fileId] ? '❤️' : '🤍';
+                    const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
+                    const safeName = file.name.replace(/'/g, "\\'");
+                    
+                    const deleteButton = type === 'history' 
+                        ? `<button class="delete-btn" title="حذف من السجل" onclick="removeFromHistory('${fileId}')">🗑️</button>` 
+                        : '';
+
+                    listContainer.innerHTML += `
+                        <div class="file-card" id="card-${fileId}">
+                            <div class="file-name" id="name-${fileId}">${isViewed} ${file.name}</div>
+                            <div class="file-actions">
+                                ${deleteButton}
+                                <button class="fav-btn fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">
+                                    ${isFav}
+                                </button>
+                                <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">
+                                    فتح الملف
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
+            }
+        }
+
+        window.onpopstate = function(event) {
+            if (event.state && event.state.screen) {
+                showScreen(event.state.screen, false);
+            } else {
+                showScreen('subjects-screen', false);
+            }
+        };
+
+        window.onload = function() {
+            history.replaceState({ screen: 'subjects-screen' }, "", "");
+        };
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (!currentUser) {
+                    document.getElementById('login-popup').classList.add('show');
+                }
+            }, 3000); 
         });
-    } else {
-        listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
-    }
-}
-        // أضف هذا الكود في نهاية قسم الـ script
-window.onpopstate = function(event) {
-    if (event.state && event.state.screen) {
-        // إذا كان هناك حالة محفوظة، نعود إليها بدون إضافة تاريخ جديد
-        showScreen(event.state.screen, false);
-    } else {
-        // إذا عدنا للبداية تماماً، نظهر الشاشة الرئيسية
-        showScreen('subjects-screen', false);
-    }
-};
 
-// كود إضافي لضبط الحالة الأولية عند فتح الموقع لأول مرة
-window.onload = function() {
-    history.replaceState({ screen: 'subjects-screen' }, "", "");
-};
-        window.toggleFavorite = function(fileId, fileName, fileUrl) {
-    if (!currentUser) { 
-        alert("يرجى تسجيل الدخول أولاً لإضافة الملفات للمفضلة."); 
-        return; 
-    }
-    
-    const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
-    const favIcon = document.getElementById(`fav-icon-${fileId}`); // الوصول للقلب
+        window.closeLoginPopup = function() {
+            document.getElementById('login-popup').classList.remove('show');
+        }
 
-    if (userFavorites[fileId]) { 
-        remove(favRef);
-        if(favIcon) favIcon.innerText = '🤍'; // تغيير فوري
-    } 
-    else { 
-        set(favRef, { name: fileName, url: fileUrl });
-        if(favIcon) favIcon.innerText = '❤️'; // تغيير فوري
-    } 
-}
-        window.markAsViewed = function(fileId, fileName, fileUrl) {
-    if (!currentUser) return; 
-
-    const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
-    set(historyRef, { name: fileName, url: fileUrl, timestamp: Date.now() });
-
-    // إضافة الشارة فوراً في الواجهة
-    const nameContainer = document.getElementById(`name-${fileId}`);
-    if (nameContainer && !nameContainer.innerHTML.includes('viewed-badge')) {
-        nameContainer.innerHTML = `<span class="viewed-badge">✓ تم العرض</span> ` + nameContainer.innerHTML;
-    }
-}
-        // إظهار النافذة بعد 3 ثواني إذا لم يكن مسجلاً
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        if (!currentUser) {
+        window.showLoginPopup = function() {
             document.getElementById('login-popup').classList.add('show');
         }
-    }, 3000); // 3000 ملي ثانية = 3 ثوانٍ
-});
-
-window.closeLoginPopup = function() {
-    document.getElementById('login-popup').classList.remove('show');
-}
-
-window.showLoginPopup = function() {
-    document.getElementById('login-popup').classList.add('show');
-}
     </script>
     <div id="login-popup" class="glass-popup">
     <div class="popup-content">
