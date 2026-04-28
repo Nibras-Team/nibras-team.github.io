@@ -337,15 +337,21 @@ window.showScreen = function(screenId, pushToHistory = true) {
                         const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
                         const safeName = file.name.replace(/'/g, "\\'");
 
-                        listContainer.innerHTML += `
-                            <div class="file-card">
-                                <div class="file-name">${isViewed} ${file.name}</div>
-                                <div class="file-actions">
-                                    <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
-                                    <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">فتح الملف</a>
-                                </div>
-                            </div>
-                        `;
+        listContainer.innerHTML += `
+    <div class="file-card">
+        <div class="file-name" id="name-${fileId}">
+            ${isViewed} ${file.name}
+        </div>
+        <div class="file-actions">
+            <button class="fav-btn" id="fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">
+                ${isFav}
+            </button>
+            <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">
+                فتح الملف
+            </a>
+        </div>
+    </div>
+`;
                     });
                 } else {
                     listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات متوفرة حالياً لهذا العام.</p>";
@@ -541,6 +547,36 @@ window.onpopstate = function(event) {
 window.onload = function() {
     history.replaceState({ screen: 'subjects-screen' }, "", "");
 };
+        window.toggleFavorite = function(fileId, fileName, fileUrl) {
+    if (!currentUser) { 
+        alert("يرجى تسجيل الدخول أولاً لإضافة الملفات للمفضلة."); 
+        return; 
+    }
+    
+    const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
+    const favIcon = document.getElementById(`fav-icon-${fileId}`); // الوصول للقلب
+
+    if (userFavorites[fileId]) { 
+        remove(favRef);
+        if(favIcon) favIcon.innerText = '🤍'; // تغيير فوري
+    } 
+    else { 
+        set(favRef, { name: fileName, url: fileUrl });
+        if(favIcon) favIcon.innerText = '❤️'; // تغيير فوري
+    } 
+}
+        window.markAsViewed = function(fileId, fileName, fileUrl) {
+    if (!currentUser) return; 
+
+    const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
+    set(historyRef, { name: fileName, url: fileUrl, timestamp: Date.now() });
+
+    // إضافة الشارة فوراً في الواجهة
+    const nameContainer = document.getElementById(`name-${fileId}`);
+    if (nameContainer && !nameContainer.innerHTML.includes('viewed-badge')) {
+        nameContainer.innerHTML = `<span class="viewed-badge">✓ تم العرض</span> ` + nameContainer.innerHTML;
+    }
+}
     </script>
 </body>
 </html>
