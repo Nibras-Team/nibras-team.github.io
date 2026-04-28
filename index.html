@@ -166,6 +166,74 @@
     object-fit: contain;
     display: block;
 }
+        /* تنسيق النافذة المنبثقة بتأثير الزجاج */
+.glass-popup {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px); /* تأثير الضبابية الزجاجي */
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.glass-popup.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.popup-content {
+    background: rgba(255, 255, 255, 0.85);
+    padding: 30px 20px;
+    border-radius: 20px;
+    width: 85%;
+    max-width: 350px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.glass-popup.show .popup-content {
+    transform: translateY(0);
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px; right: 15px;
+    background: none; border: none;
+    font-size: 28px; cursor: pointer; color: #555;
+}
+
+.popup-login-btn {
+    background-color: var(--primary-color, #0056b3);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-top: 15px;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* تنسيق زر الحذف في السجل */
+.delete-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: transform 0.2s;
+}
+.delete-btn:hover { transform: scale(1.2); }
     </style>
 </head>
 <body>
@@ -486,12 +554,40 @@ window.executeSearch = function() {
             }
         });
 
-        window.toggleFavorite = function(fileId, fileName, fileUrl) {
-            if (!currentUser) { alert("يرجى تسجيل الدخول أولاً لإضافة الملفات للمفضلة."); return; }
-            const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
-            if (userFavorites[fileId]) { remove(favRef); } 
-            else { set(favRef, { name: fileName, url: fileUrl }); } 
+      window.toggleFavorite = function(fileId, fileName, fileUrl) {
+    if (!currentUser) { 
+        showLoginPopup(); // إظهار النافذة الزجاجية بدلاً من alert
+        return; 
+    }
+    
+    const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
+    
+    // البحث عن كل القلوب التي تحمل هذا الـ ID في أي مكان في الموقع (بحث، سجل، مفضلة)
+    const favIcons = document.querySelectorAll(`.fav-icon-${fileId}`);
+
+    if (userFavorites[fileId]) { 
+        // 1. الإزالة من قاعدة البيانات
+        remove(favRef);
+        delete userFavorites[fileId]; // تحديث المتغير المحلي
+        
+        // 2. التحديث اللحظي لكل القلوب لتصبح بيضاء
+        favIcons.forEach(icon => icon.innerText = '🤍');
+
+        // 3. إذا كنا داخل قائمة المفضلة، نحذف البطاقة فوراً وبشكل حركي
+        const cardToHide = document.getElementById(`card-${fileId}`);
+        if (cardToHide && document.getElementById('favorites-screen').classList.contains('active')) {
+            cardToHide.style.display = 'none'; // إخفاء فوري
         }
+    } 
+    else { 
+        // 1. الإضافة لقاعدة البيانات
+        set(favRef, { name: fileName, url: fileUrl });
+        userFavorites[fileId] = true;
+        
+        // 2. التحديث اللحظي لكل القلوب لتصبح حمراء
+        favIcons.forEach(icon => icon.innerText = '❤️');
+    } 
+}
 
         window.markAsViewed = function(fileId, fileName, fileUrl) {
             if (!currentUser) return; 
@@ -499,39 +595,63 @@ window.executeSearch = function() {
             set(historyRef, { name: fileName, url: fileUrl, timestamp: Date.now() });
         }
 
-        window.showUserFiles = function(type) {
-            toggleSidebar(); 
-            const listContainer = document.getElementById('files-list');
-            listContainer.innerHTML = "";
-            document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل الملفات المعروضة';
-            
-            // ضبط زر العودة للرئيسية
-            document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
-            document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
+window.showUserFiles = function(type) {
+    toggleSidebar(); 
+    const listContainer = document.getElementById('files-list');
+    listContainer.innerHTML = "";
+    
+    // ضبط العنوان بناءً على النوع
+    document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل الملفات المعروضة';
+    
+    // ضبط زر العودة للرئيسية
+    document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
+    document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
 
-            showScreen('files-screen');
+    showScreen('files-screen');
 
-            const data = type === 'favorites' ? userFavorites : userHistory;
-            if (Object.keys(data).length > 0) {
-                Object.keys(data).forEach(fileId => {
-                    const file = data[fileId];
-                    const isFav = userFavorites[fileId] ? '❤️' : '🤍';
-                    const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
-                    
-                    listContainer.innerHTML += `
-                        <div class="file-card">
-                            <div class="file-name">${isViewed} ${file.name}</div>
-                            <div class="file-actions">
-                                <button class="fav-btn" onclick="toggleFavorite('${fileId}', '${file.name.replace(/'/g, "\\'")}', '${file.url}')">${isFav}</button>
-                                <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${file.name.replace(/'/g, "\\'")}', '${file.url}')">فتح الملف</a>
-                            </div>
-                        </div>
-                    `;
-                });
-            } else {
-                listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
-            }
+    let data = type === 'favorites' ? userFavorites : userHistory;
+    
+    if (Object.keys(data).length > 0) {
+        // تحويل البيانات إلى مصفوفة للتمكن من ترتيبها
+        let itemsArray = Object.keys(data).map(fileId => {
+            return { id: fileId, ...data[fileId] };
+        });
+
+        // إذا كنا في السجل، نرتب من الأحدث للأقدم بناءً على الـ timestamp
+        if (type === 'history') {
+            itemsArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         }
+
+        itemsArray.forEach(file => {
+            const fileId = file.id;
+            const isFav = userFavorites[fileId] ? '❤️' : '🤍';
+            const isViewed = userHistory[fileId] ? `<span class="viewed-badge">✓ تم العرض</span>` : '';
+            const safeName = file.name.replace(/'/g, "\\'");
+            
+            // إضافة زر الحذف فقط إذا كنا في قائمة السجل
+            const deleteButton = type === 'history' 
+                ? `<button class="delete-btn" title="حذف من السجل" onclick="removeFromHistory('${fileId}')">🗑️</button>` 
+                : '';
+
+            listContainer.innerHTML += `
+                <div class="file-card" id="card-${fileId}">
+                    <div class="file-name" id="name-${fileId}">${isViewed} ${file.name}</div>
+                    <div class="file-actions">
+                        ${deleteButton}
+                        <button class="fav-btn fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">
+                            ${isFav}
+                        </button>
+                        <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">
+                            فتح الملف
+                        </a>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
+    }
+}
         // أضف هذا الكود في نهاية قسم الـ script
 window.onpopstate = function(event) {
     if (event.state && event.state.screen) {
@@ -577,6 +697,31 @@ window.onload = function() {
         nameContainer.innerHTML = `<span class="viewed-badge">✓ تم العرض</span> ` + nameContainer.innerHTML;
     }
 }
+        // إظهار النافذة بعد 3 ثواني إذا لم يكن مسجلاً
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        if (!currentUser) {
+            document.getElementById('login-popup').classList.add('show');
+        }
+    }, 3000); // 3000 ملي ثانية = 3 ثوانٍ
+});
+
+window.closeLoginPopup = function() {
+    document.getElementById('login-popup').classList.remove('show');
+}
+
+window.showLoginPopup = function() {
+    document.getElementById('login-popup').classList.add('show');
+}
     </script>
+    <div id="login-popup" class="glass-popup">
+    <div class="popup-content">
+        <button class="close-btn" onclick="closeLoginPopup()">&times;</button>
+        <div style="font-size: 40px; margin-bottom: 10px;">🔒</div>
+        <h3>تنبيه هام</h3>
+        <p>يرجى تسجيل الدخول لتتمكن من حفظ الملفات في المفضلة والاحتفاظ بسجل مشاهداتك.</p>
+        <button class="popup-login-btn" onclick="signIn(); closeLoginPopup();">تسجيل الدخول باستخدام Google</button>
+    </div>
+</div>
 </body>
 </html>
