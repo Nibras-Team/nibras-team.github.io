@@ -174,7 +174,7 @@
 
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <h3>فريق النبراس</h3>
+            <h3>فريق النبراس التطوعي</h3>
         </div>
         
         <div id="auth-section">
@@ -195,7 +195,7 @@
         <div class="accordion-item">
             <button class="accordion-btn">نبذة عن الفريق</button>
             <div class="accordion-content">
-                <p>فريق النبراس التطوعي، هو فريق غير ربحي يتكون من طلابٍ سابقين في معهد النبراس على اختلاف اختصاصاتهم الجامعية...</p>
+                <p>فريق النبراس التطوعي، هو فريق غير ربحي يتكون من طلابٍ سابقين في معهد النبراس على اختلاف اختصاصاتهم الجامعية، أهداف الفريق تتمثل بالارتقاء بمستوى الطلاب إلى مستوى يمكّنهم من الوصول إلى غاياتهم ومرادهم في مستقبلهم، والسبيل إلى ذلك بعد توفيقه تعالى هو نشر النماذج المتعددة والمتنوعة والاختبارات السابقة للمواد الدراسيّة -باستثناء مادتي الفيزياء واللغة الفرنسية- قاصدين بذلك إتاحة الفرصة أمام الطالب ليتدرب ويصقل مهاراته العلمية، ويصحح لنفسه ويعرف أخطاءه فيتجنب الوقوع فيها لاحقاً، واللهَ نسألُ التوفيقَ والسداد.</p>
             </div>
         </div>
 
@@ -503,7 +503,7 @@ window.executeSearch = function() {
             toggleSidebar(); 
             const listContainer = document.getElementById('files-list');
             listContainer.innerHTML = "";
-            document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل المشاهدات';
+            document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل الملفات المعروضة';
             
             // ضبط زر العودة للرئيسية
             document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
