@@ -160,6 +160,12 @@
             border-radius: 20px; font-size: 0.75rem; font-weight: bold; 
             display: inline-flex; align-items: center; gap: 5px;
         }
+        #navbar-logo {
+    height: 45px; /* يمكنك تعديل هذا الرقم لتكبير أو تصغير الشعار */
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
     </style>
 </head>
 <body>
@@ -211,7 +217,9 @@
     </div>
 
     <nav class="navbar">
-        <div class="logo">فريق النبراس التطوعي</div>
+       <div class="logo">
+    <img src="https://drive.google.com/file/d/1d9VW4oecXI2jtQSuUdOA3GDM7pQaHaoq/view" alt="فريق النبراس التطوعي" id="navbar-logo">
+</div>
         <div class="nav-actions">
             <a href="https://t.me/NibrasInstituteBot" target="_blank" class="nav-icon" title="بوت النبراس">
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.96 1.25-5.54 3.67-.52.36-.99.54-1.41.53-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.23.36-.48.98-.75 3.84-1.67 6.4-2.78 7.68-3.32 3.65-1.53 4.41-1.8 4.9-1.81.11 0 .36.03.5.15.11.1.15.23.16.35-.01.06-.01.12-.02.24z"/></svg>
@@ -340,41 +348,39 @@
         }
 
         // --- دالة البحث المحسنة باستخدام get للتعامل مع الأخطاء وإيقاف الدوران اللانهائي ---
-        window.executeSearch = function() {
-            const query = document.getElementById('search-input').value.trim().toLowerCase();
-            if(!query) return;
+window.executeSearch = function() {
+    const query = document.getElementById('search-input').value.trim().toLowerCase();
+    if(!query) return;
 
-            const listContainer = document.getElementById('files-list');
-            const loader = document.getElementById('loader');
-            
-            listContainer.innerHTML = ""; 
-            loader.style.display = "block"; 
-            
-            // ضبط زر العودة للرئيسية
-            document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
-            document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
-            document.getElementById('files-title').innerText = "نتائج البحث عن: " + query;
-            
-            showScreen('files-screen');
+    const listContainer = document.getElementById('files-list');
+    const loader = document.getElementById('loader');
+    
+    listContainer.innerHTML = ""; 
+    loader.style.display = "block"; 
+    
+    document.getElementById('dynamic-back-btn').onclick = function() { showScreen('subjects-screen'); };
+    document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
+    document.getElementById('files-title').innerText = "نتائج البحث عن: " + query;
+    
+    showScreen('files-screen');
 
-            const dbRef = ref(db, '/');
-            // استخدمنا get بدلاً من onValue لالتقاط الخطأ بشكل صحيح في حال حدوثه
-            get(dbRef).then((snapshot) => {
-                loader.style.display = "none";
-                const allData = snapshot.val();
-                let resultsFound = false;
+    const dbRef = ref(db, '/');
+    
+    get(dbRef).then((snapshot) => {
+        loader.style.display = "none";
+        const allData = snapshot.val();
+        let resultsFound = false;
 
-                if (allData) {
-                    Object.keys(allData).forEach(subject => {
-                        if (subject === 'users') return; // تخطي مجلد المستخدمين الخاص
-                        
-                        const years = allData[subject];
-                        if (typeof years !== 'object') return; // لتجنب الأخطاء إذا كانت البيانات نصية
-
-                        Object.keys(years).forEach(year => {
-                            const files = years[year];
-                            if (typeof files !== 'object') return;
-
+        // التأكد من وجود بيانات فعلية قبل البحث لتجنب أخطاء الكود
+        if (allData && typeof allData === 'object') {
+            Object.keys(allData).forEach(subject => {
+                if (subject === 'users') return; // تخطي بيانات المستخدمين
+                
+                const years = allData[subject];
+                if (years && typeof years === 'object') {
+                    Object.keys(years).forEach(year => {
+                        const files = years[year];
+                        if (files && typeof files === 'object') {
                             Object.keys(files).forEach(fileId => {
                                 const file = files[fileId];
                                 
@@ -398,19 +404,27 @@
                                     `;
                                 }
                             });
-                        });
+                        }
                     });
                 }
-
-                if (!resultsFound) {
-                    listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لم يتم العثور على ملفات تطابق بحثك.</p>";
-                }
-            }).catch((error) => {
-                // إيقاف التحميل وإظهار رسالة خطأ واضحة
-                loader.style.display = "none";
-                listContainer.innerHTML = `<p style='padding:20px; color:red; font-weight:bold;'>حدث خطأ أثناء البحث. يرجى التحقق من اتصالك بالإنترنت.</p>`;
-                console.error("خطأ في البحث:", error);
             });
+        }
+
+        if (!resultsFound) {
+            listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لم يتم العثور على ملفات تطابق بحثك.</p>";
+        }
+    }).catch((error) => {
+        loader.style.display = "none";
+        
+        // طباعة الخطأ الحقيقي على الشاشة لتسهيل حله
+        if(error.message.includes("Permission denied")) {
+            listContainer.innerHTML = `<p style='padding:20px; color:red; font-weight:bold;'>خطأ: Firebase يمنع الوصول. يرجى تعديل (Rules) في منصة Firebase وجعل ".read": true</p>`;
+        } else {
+            listContainer.innerHTML = `<p style='padding:20px; color:red; font-weight:bold;'>حدث خطأ: ${error.message}</p>`;
+        }
+        console.error("تفاصيل خطأ البحث:", error);
+    });
+}
         }
 
         window.toggleSidebar = function() {
