@@ -292,11 +292,17 @@
 
         let selectedSubject = "";
 
-        window.showScreen = function(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
+     
+window.showScreen = function(screenId, pushToHistory = true) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+
+    // إذا كان الانتقال جديداً (وليس ناتجاً عن ضغط زر الرجوع)، نحفظه في التاريخ
+    if (pushToHistory) {
+        history.pushState({ screen: screenId }, "", "#" + screenId);
+    }
+}
 
         window.openYearScreen = function(subject) {
             selectedSubject = subject;
@@ -520,6 +526,21 @@ window.executeSearch = function() {
                 listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
             }
         }
+        // أضف هذا الكود في نهاية قسم الـ script
+window.onpopstate = function(event) {
+    if (event.state && event.state.screen) {
+        // إذا كان هناك حالة محفوظة، نعود إليها بدون إضافة تاريخ جديد
+        showScreen(event.state.screen, false);
+    } else {
+        // إذا عدنا للبداية تماماً، نظهر الشاشة الرئيسية
+        showScreen('subjects-screen', false);
+    }
+};
+
+// كود إضافي لضبط الحالة الأولية عند فتح الموقع لأول مرة
+window.onload = function() {
+    history.replaceState({ screen: 'subjects-screen' }, "", "");
+};
     </script>
 </body>
 </html>
