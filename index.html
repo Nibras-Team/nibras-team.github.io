@@ -902,9 +902,11 @@
             });
         }
 
-        window.signInWithGoogle = function() {
-            signInWithPopup(auth, provider).catch(error => alert("حدث خطأ أثناء تسجيل الدخول: " + error.message));
-        }
+window.signInWithGoogle = function() {
+    signInWithPopup(auth, provider).then(() => {
+        window.closeLoginPopup(); // يتم إغلاق النافذة فقط بعد نجاح الدخول
+    }).catch(error => alert("حدث خطأ أثناء تسجيل الدخول: " + error.message));
+}
         window.logout = function() { signOut(auth); }
 
         onAuthStateChanged(auth, (user) => {
@@ -1319,7 +1321,7 @@
         <div style="font-size: 40px; margin-bottom: 10px;">🔐</div>
         <h3>تنبيه هام</h3>
         <p>يرجى تسجيل الدخول لتتمكن من حفظ الملفات في المفضلة والاحتفاظ بسجل مشاهداتك، ولاستخدام المساعد الذكي.</p>
-        <button class="popup-login-btn" onclick="signInWithGoogle(); closeLoginPopup();">تسجيل الدخول باستخدام Google</button>
+        <button class="popup-login-btn" onclick="signInWithGoogle();">تسجيل الدخول باستخدام Google</button>
     </div>
 </div>
 </body>
