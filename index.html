@@ -1223,7 +1223,7 @@
 
             // بوابة تسجيل الدخول: كل شيء متاح، ويتوقف هنا فقط (ونُبقي نصّه كما هو ليُرسله بعد الدخول)
             if (!currentUser) {
-                appendMsg('note', 'لإرسال رسالتك إلى المساعد، يرجى تسجيل الدخول أولاً \ud83d\udd12');
+                appendMsg('note', 'لإرسال رسالتك إلى المساعد، يرجى تسجيل الدخول أولاً 🔐');
                 showLoginPopup();
                 return;
             }
@@ -1316,7 +1316,7 @@
     <div id="login-popup" class="glass-popup">
     <div class="popup-content">
         <button class="close-btn" onclick="closeLoginPopup()">&times;</button>
-        <div style="font-size: 40px; margin-bottom: 10px;">\ud83d\udd12</div>
+        <div style="font-size: 40px; margin-bottom: 10px;">🔐</div>
         <h3>تنبيه هام</h3>
         <p>يرجى تسجيل الدخول لتتمكن من حفظ الملفات في المفضلة والاحتفاظ بسجل مشاهداتك، ولاستخدام المساعد الذكي.</p>
         <button class="popup-login-btn" onclick="signInWithGoogle(); closeLoginPopup();">تسجيل الدخول باستخدام Google</button>
