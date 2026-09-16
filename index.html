@@ -238,7 +238,100 @@
 
         .screen-top-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .home-btn { background: none; border: none; color: var(--primary-color); font-weight: bold; cursor: pointer; font-size: 1rem; display: none; }
-        #show-all-files-btn { display: block; width: 100%; margin-top: 25px; border-color: var(--accent-color); }
+
+        /* الزر العريض أسفل شاشة التصنيفات — يتبادل مكانه بين "حسب المعلم" (بالرئيسية) و"كل الملفات" (داخل فرع) */
+        .wide-btn { display: block; width: 100%; margin-top: 25px; border-color: var(--accent-color); }
+
+        /* الكلمات المفتاحية أسفل مربع البحث */
+        #search-keywords {
+            display: none; flex-wrap: wrap; gap: 8px; padding: 0 5% 15px;
+            background: var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-top: -21px; margin-bottom: 21px;
+        }
+        #search-keywords.show { display: flex; }
+        .kw-chip {
+            background: var(--bg-color); color: var(--primary-color); border: 1px solid #e1e3ea;
+            padding: 7px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;
+            cursor: pointer; transition: var(--transition);
+        }
+        .kw-chip:hover { background: var(--accent-color); color: var(--primary-color); border-color: var(--accent-color); transform: translateY(-2px); }
+
+        /* تأثير التباعد والتقارب أثناء تمرير الملفات */
+        .file-card { transition: transform 0.35s ease, opacity 0.35s ease, box-shadow 0.35s ease; will-change: transform; }
+        @media (prefers-reduced-motion: reduce) {
+            .file-card { transition: none !important; transform: none !important; opacity: 1 !important; }
+        }
+
+        /* ===================== فقاعة المساعد الذكي ===================== */
+        #chat-fab {
+            position: fixed; bottom: 22px; left: 22px; width: 62px; height: 62px; border-radius: 50%;
+            background: var(--primary-color); color: var(--white); border: none; cursor: pointer;
+            box-shadow: 0 6px 22px rgba(30, 55, 153, 0.35); z-index: 1200;
+            display: flex; align-items: center; justify-content: center; font-size: 1.7rem;
+            transition: var(--transition);
+        }
+        #chat-fab:hover { transform: scale(1.08); background: var(--accent-color); color: var(--primary-color); }
+        #chat-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.4); }
+
+        #chat-panel {
+            position: fixed; inset: 0; background: var(--bg-color); z-index: 1300;
+            display: flex; flex-direction: column;
+            opacity: 0; pointer-events: none; transform: scale(0.9) translateY(30px);
+            transform-origin: bottom left; transition: var(--transition);
+        }
+        #chat-panel.open { opacity: 1; pointer-events: auto; transform: none; }
+
+        .chat-header {
+            background: var(--primary-color); color: var(--white); padding: 16px 18px;
+            display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+        }
+        .chat-header h3 { font-size: 1.15rem; font-weight: bold; }
+        .chat-header button { background: none; border: none; color: var(--white); font-size: 1.6rem; cursor: pointer; line-height: 1; }
+
+        .chat-messages { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+        .msg {
+            max-width: 85%; padding: 12px 16px; border-radius: 16px; line-height: 1.75;
+            white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; font-size: 0.98rem;
+            animation: slideUp 0.35s ease forwards;
+        }
+        .msg.user { align-self: flex-end; background: var(--primary-color); color: var(--white); border-bottom-left-radius: 4px; }
+        .msg.bot { align-self: flex-start; background: var(--white); color: var(--text-dark); border-bottom-right-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .msg.note { align-self: center; background: #fff4d6; color: #8a6d1f; font-size: 0.9rem; text-align: center; max-width: 95%; }
+
+        .chat-file {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            background: var(--white); border-right: 5px solid var(--accent-color); border-radius: 12px;
+            padding: 12px 14px; align-self: flex-start; max-width: 85%; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            animation: slideUp 0.35s ease forwards;
+        }
+        .chat-file .cf-name { font-size: 0.92rem; font-weight: 600; line-height: 1.5; }
+        .chat-file .cf-path { font-size: 0.75rem; color: var(--primary-color); display: block; margin-bottom: 4px; }
+        .chat-file a { background: var(--primary-color); color: var(--white); padding: 8px 14px; border-radius: 8px;
+                       text-decoration: none; font-size: 0.82rem; font-weight: bold; white-space: nowrap; }
+
+        .typing span {
+            display: inline-block; width: 7px; height: 7px; margin: 0 2px; background: var(--primary-color);
+            border-radius: 50%; opacity: 0.4; animation: blink 1.2s infinite;
+        }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%, 100% { opacity: 0.25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
+
+        .chat-input-bar {
+            display: flex; gap: 10px; padding: 14px; background: var(--white);
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.06); flex-shrink: 0;
+        }
+        #chat-input {
+            flex: 1; padding: 12px 15px; border: 2px solid #ddd; border-radius: 12px;
+            outline: none; font-size: 1rem; resize: none; max-height: 110px; font-family: inherit;
+        }
+        #chat-input:focus { border-color: var(--primary-color); }
+        #chat-send {
+            background: var(--primary-color); color: var(--white); border: none; border-radius: 12px;
+            padding: 0 22px; font-weight: bold; cursor: pointer; transition: var(--transition); font-size: 1rem;
+        }
+        #chat-send:hover:not(:disabled) { background: var(--accent-color); color: var(--primary-color); }
+        #chat-send:disabled { opacity: 0.55; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -304,9 +397,11 @@
     </nav>
 
     <div id="search-bar-container">
-        <input type="text" id="search-input" placeholder="ابحث عن اسم الملف هنا..." onkeyup="if(event.key === 'Enter') executeSearch()">
-        <button id="search-btn" onclick="executeSearch()">بحث</button>
+        <input type="text" id="search-input" placeholder="ابحث في أسماء الملفات ومحتواها..." autocomplete="off"
+               oninput="window.onSearchInput()" onfocus="window.showKeywords()">
+        <button id="search-btn" onclick="window.onSearchInput(true)">بحث</button>
     </div>
+    <div id="search-keywords"></div>
 
     <main class="main-content">
         <section id="category-screen" class="screen active">
@@ -317,7 +412,8 @@
             <div id="category-breadcrumb" style="display:none;"></div>
             <h2 id="category-title">تصفح الملفات حسب السنة</h2>
             <div id="category-buttons" class="btn-list"></div>
-            <button id="show-all-files-btn" class="btn" onclick="window.loadAllFilesInCurrentCategory()">📄 عرض كل الملفات هنا</button>
+            <button id="teacher-mode-btn" class="btn wide-btn" onclick="window.enterTeacherMode()">👨‍🏫 التصنيف حسب المعلم</button>
+            <button id="show-all-files-btn" class="btn wide-btn" onclick="window.loadAllFilesInCurrentCategory()" style="display:none;">📄 عرض كل الملفات هنا</button>
         </section>
 
         <section id="files-screen" class="screen">
@@ -330,6 +426,22 @@
             <div id="files-list"></div>
         </section>
     </main>
+
+    <button id="chat-fab" onclick="window.openChat()" title="المساعد الذكي" aria-label="المساعد الذكي">🤖</button>
+
+    <div id="chat-panel" role="dialog" aria-label="المساعد الذكي">
+        <div class="chat-header">
+            <h3>🤖 مساعد النبراس</h3>
+            <button onclick="window.closeChat()" title="تصغير" aria-label="تصغير">&times;</button>
+        </div>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input-bar">
+            <textarea id="chat-input" rows="1" placeholder="اسأل عن أي ملف أو موضوع دراسي..."
+                      oninput="window.autoGrowChatInput(this)"
+                      onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.sendChatMessage(); }"></textarea>
+            <button id="chat-send" onclick="window.sendChatMessage()">إرسال</button>
+        </div>
+    </div>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -350,16 +462,19 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
+        // اسم نموذج Gemini المستخدم للمساعد — لتغييره لاحقاً عدّل هذا السطر وحده فقط.
+        const GEMINI_MODEL = "gemini-3.5-flash-lite";
+
         let currentUser = null; 
         let userFavorites = {}; 
         let userHistory = {};  
 
         // ============================================================
-        // شجرة التصنيفات — مطابقة تماماً لتصنيفات بوت التيليجرام (باستثناء
-        // فرعين تجريبيين لا يحويان ملفات حقيقية). كل عقدة: {id, name, children}.
-        // العقدة التي children فيها فارغة = "ورقة" تُعرَض عندها الملفات مباشرة.
+        // شجرة التصنيفات — مطابقة لتصنيفات بوت التيليجرام (بلا التصنيفات
+        // التجريبية والفارغة). كل عقدة: {id, name, children}؛ العقدة بلا
+        // children = "ورقة" تُعرض عندها الملفات مباشرة.
         // ============================================================
-        const CATEGORY_TREE = [{"id":1,"name":"2023","children":[{"id":2,"name":"الرياضيات","children":[{"id":3,"name":"امتحانات نصفية","children":[]},{"id":4,"name":"مذاكرات","children":[]}]},{"id":5,"name":"الكيمياء","children":[{"id":6,"name":"مذاكرات","children":[]}]},{"id":7,"name":"اللغة الإنجليزية","children":[{"id":8,"name":"امتحانات نصفية","children":[]},{"id":9,"name":"مذاكرات فصلية","children":[]}]},{"id":10,"name":"اللغة العربية","children":[{"id":11,"name":"مذاكرات فصلية","children":[]}]},{"id":12,"name":"علوم","children":[{"id":13,"name":"مذاكرات","children":[]},{"id":103,"name":"تجربة","children":[]}]}]},{"id":14,"name":"2024","children":[{"id":15,"name":"الرياضيات","children":[{"id":16,"name":"أوراق عمل","children":[{"id":17,"name":"تحليل 1","children":[]},{"id":18,"name":"تحليل 2","children":[]},{"id":19,"name":"جبر","children":[]}]},{"id":20,"name":"كويزات","children":[{"id":21,"name":"أشعة","children":[]},{"id":22,"name":"تحليل 1","children":[]},{"id":23,"name":"تحليل 2","children":[]},{"id":24,"name":"جبر","children":[]}]},{"id":25,"name":"مذاكرات","children":[{"id":26,"name":"تحليل","children":[]},{"id":27,"name":"جبر","children":[]}]}]},{"id":28,"name":"الكيمياء","children":[{"id":29,"name":"أوراق عمل","children":[]},{"id":30,"name":"امتحانات","children":[]},{"id":31,"name":"كويزات","children":[]},{"id":32,"name":"مذاكرات","children":[]}]},{"id":33,"name":"اللغة الإنجليزية","children":[{"id":34,"name":"أوراق عمل","children":[]},{"id":35,"name":"اختبارات وكويزات","children":[]},{"id":36,"name":"امتحانات","children":[]},{"id":37,"name":"مذاكرات","children":[]}]},{"id":38,"name":"اللغة العربية","children":[{"id":39,"name":"اختبارات صفية","children":[]},{"id":40,"name":"امتحان الفصل الأول","children":[]},{"id":41,"name":"مذاكرات","children":[]}]},{"id":42,"name":"علوم","children":[{"id":43,"name":"أوراق عمل","children":[]},{"id":44,"name":"امتحانات","children":[]},{"id":45,"name":"كويزات","children":[]},{"id":46,"name":"مذاكرات","children":[]}]}]},{"id":47,"name":"2025","children":[{"id":48,"name":"الرياضيات","children":[{"id":49,"name":"أوراق عمل","children":[{"id":50,"name":"تحليل 1","children":[]},{"id":51,"name":"تحليل 2","children":[]},{"id":52,"name":"جبر","children":[]},{"id":104,"name":"أشعة","children":[]}]},{"id":53,"name":"امتحانات ومذاكرات","children":[]},{"id":54,"name":"كويزات","children":[{"id":55,"name":"أشعة","children":[]},{"id":56,"name":"تحليل 1","children":[]},{"id":57,"name":"تحليل 2","children":[]},{"id":58,"name":"جبر","children":[]}]}]},{"id":59,"name":"الكيمياء","children":[{"id":60,"name":"أوراق عمل","children":[]},{"id":61,"name":"امتحانات ومذاكرات","children":[]},{"id":62,"name":"كويزات","children":[]}]},{"id":63,"name":"اللغة الإنجليزية","children":[{"id":64,"name":"أوراق عمل","children":[]},{"id":65,"name":"امتحانات ومذاكرات","children":[]},{"id":66,"name":"كويزات","children":[]}]},{"id":67,"name":"اللغة العربية","children":[{"id":68,"name":"أوراق عمل","children":[]},{"id":69,"name":"امتحانات","children":[]},{"id":70,"name":"مذاكرات","children":[]}]},{"id":71,"name":"علوم","children":[{"id":72,"name":"أوراق عمل","children":[]},{"id":73,"name":"امتحانات","children":[]},{"id":74,"name":"كويزات","children":[]},{"id":75,"name":"مذاكرات","children":[]}]}]},{"id":76,"name":"2026","children":[{"id":77,"name":"الكيمياء","children":[{"id":78,"name":"أوراق عمل","children":[]},{"id":79,"name":"امتحانات","children":[]},{"id":80,"name":"كويزات","children":[{"id":81,"name":"الغازات","children":[]},{"id":82,"name":"الكيمياء النووية","children":[]}]}]},{"id":83,"name":"اللغة الإنجليزية","children":[{"id":84,"name":"أوراق عمل","children":[]},{"id":85,"name":"امتحانات","children":[]}]},{"id":86,"name":"اللغة العربية","children":[{"id":87,"name":"أوراق عمل","children":[]},{"id":88,"name":"امتحانات نصفية","children":[]},{"id":89,"name":"كويزات","children":[]}]},{"id":90,"name":"رياضيات","children":[{"id":91,"name":"أوراق عمل","children":[{"id":92,"name":"تحليل 1","children":[]},{"id":93,"name":"تحليل 2","children":[]},{"id":94,"name":"جبر","children":[]}]},{"id":95,"name":"امتحانات","children":[]},{"id":96,"name":"كويزات","children":[{"id":97,"name":"أشعة","children":[]},{"id":98,"name":"تحليل","children":[]},{"id":99,"name":"جبر","children":[]}]}]},{"id":100,"name":"علوم","children":[{"id":101,"name":"أوراق عمل","children":[]},{"id":102,"name":"كويزات","children":[]}]}]}];
+        const CATEGORY_TREE = [{"id":1,"name":"2023","children":[{"id":2,"name":"الرياضيات","children":[{"id":3,"name":"امتحانات نصفية","children":[]},{"id":4,"name":"مذاكرات","children":[]}]},{"id":5,"name":"الكيمياء","children":[{"id":6,"name":"مذاكرات","children":[]}]},{"id":7,"name":"اللغة الإنجليزية","children":[{"id":8,"name":"امتحانات نصفية","children":[]},{"id":9,"name":"مذاكرات فصلية","children":[]}]},{"id":10,"name":"اللغة العربية","children":[{"id":11,"name":"مذاكرات فصلية","children":[]}]},{"id":12,"name":"علوم","children":[{"id":13,"name":"مذاكرات","children":[]}]}]},{"id":14,"name":"2024","children":[{"id":15,"name":"الرياضيات","children":[{"id":16,"name":"أوراق عمل","children":[{"id":17,"name":"تحليل 1","children":[]},{"id":18,"name":"تحليل 2","children":[]},{"id":19,"name":"جبر","children":[]}]},{"id":20,"name":"كويزات","children":[{"id":21,"name":"أشعة","children":[]},{"id":22,"name":"تحليل 1","children":[]},{"id":23,"name":"تحليل 2","children":[]},{"id":24,"name":"جبر","children":[]}]},{"id":25,"name":"مذاكرات","children":[{"id":26,"name":"تحليل","children":[]},{"id":27,"name":"جبر","children":[]}]}]},{"id":28,"name":"الكيمياء","children":[{"id":29,"name":"أوراق عمل","children":[]},{"id":30,"name":"امتحانات","children":[]},{"id":31,"name":"كويزات","children":[]},{"id":32,"name":"مذاكرات","children":[]}]},{"id":33,"name":"اللغة الإنجليزية","children":[{"id":34,"name":"أوراق عمل","children":[]},{"id":35,"name":"اختبارات وكويزات","children":[]},{"id":36,"name":"امتحانات","children":[]},{"id":37,"name":"مذاكرات","children":[]}]},{"id":38,"name":"اللغة العربية","children":[{"id":39,"name":"اختبارات صفية","children":[]},{"id":40,"name":"امتحان الفصل الأول","children":[]},{"id":41,"name":"مذاكرات","children":[]}]},{"id":42,"name":"علوم","children":[{"id":43,"name":"أوراق عمل","children":[]},{"id":44,"name":"امتحانات","children":[]},{"id":45,"name":"كويزات","children":[]},{"id":46,"name":"مذاكرات","children":[]}]}]},{"id":47,"name":"2025","children":[{"id":48,"name":"الرياضيات","children":[{"id":49,"name":"أوراق عمل","children":[{"id":50,"name":"تحليل 1","children":[]},{"id":51,"name":"تحليل 2","children":[]},{"id":52,"name":"جبر","children":[]}]},{"id":53,"name":"امتحانات ومذاكرات","children":[]},{"id":54,"name":"كويزات","children":[{"id":55,"name":"أشعة","children":[]},{"id":56,"name":"تحليل 1","children":[]},{"id":57,"name":"تحليل 2","children":[]},{"id":58,"name":"جبر","children":[]}]}]},{"id":59,"name":"الكيمياء","children":[{"id":60,"name":"أوراق عمل","children":[]},{"id":61,"name":"امتحانات ومذاكرات","children":[]},{"id":62,"name":"كويزات","children":[]}]},{"id":63,"name":"اللغة الإنجليزية","children":[{"id":64,"name":"أوراق عمل","children":[]},{"id":65,"name":"امتحانات ومذاكرات","children":[]},{"id":66,"name":"كويزات","children":[]}]},{"id":67,"name":"اللغة العربية","children":[{"id":68,"name":"أوراق عمل","children":[]},{"id":69,"name":"امتحانات","children":[]},{"id":70,"name":"مذاكرات","children":[]}]},{"id":71,"name":"علوم","children":[{"id":72,"name":"أوراق عمل","children":[]},{"id":73,"name":"امتحانات","children":[]},{"id":74,"name":"كويزات","children":[]},{"id":75,"name":"مذاكرات","children":[]}]}]},{"id":76,"name":"2026","children":[{"id":77,"name":"الكيمياء","children":[{"id":78,"name":"أوراق عمل","children":[]},{"id":79,"name":"امتحانات","children":[]},{"id":80,"name":"كويزات","children":[{"id":81,"name":"الغازات","children":[]},{"id":82,"name":"الكيمياء النووية","children":[]}]}]},{"id":83,"name":"اللغة الإنجليزية","children":[{"id":84,"name":"أوراق عمل","children":[]},{"id":85,"name":"امتحانات","children":[]}]},{"id":86,"name":"اللغة العربية","children":[{"id":87,"name":"أوراق عمل","children":[]},{"id":88,"name":"امتحانات نصفية","children":[]},{"id":89,"name":"كويزات","children":[]}]},{"id":90,"name":"رياضيات","children":[{"id":91,"name":"أوراق عمل","children":[{"id":92,"name":"تحليل 1","children":[]},{"id":93,"name":"تحليل 2","children":[]},{"id":94,"name":"جبر","children":[]}]},{"id":95,"name":"امتحانات","children":[]},{"id":96,"name":"كويزات","children":[{"id":97,"name":"أشعة","children":[]},{"id":98,"name":"تحليل","children":[]},{"id":99,"name":"جبر","children":[]}]}]},{"id":100,"name":"علوم","children":[{"id":101,"name":"أوراق عمل","children":[]},{"id":102,"name":"كويزات","children":[]}]}]}];
 
         const CATEGORIES_BY_ID = {};
         (function indexTree(nodes, parentId) {
@@ -369,13 +484,33 @@
             });
         })(CATEGORY_TREE, null);
 
-        // قائمة المعلمين (نفس مصدر "حسب المعلم" في بوت التيليجرام) — ثابتة أيضاً؛
-        // الملفات الفعلية لكل معلّم تُقرأ حيّة من Firebase تحت files_by_teacher/{key}
         const TEACHERS = [{"key":"t1","name":"أسيدة خلوف"},{"key":"t2","name":"إسماعيل الديري"},{"key":"t3","name":"إنعام"},{"key":"t4","name":"حسين زهرية"},{"key":"t5","name":"خليل عبد المجيد"},{"key":"t6","name":"دياب الفضلي"},{"key":"t7","name":"رامز عرنوس"},{"key":"t8","name":"شهير السلطي"},{"key":"t9","name":"صالح المالح"},{"key":"t10","name":"ضياء عيون"},{"key":"t11","name":"عبد الناصر زيدان"},{"key":"t12","name":"محمد جاسم"},{"key":"t13","name":"منير إدريس"},{"key":"t14","name":"ناصر الهزاع"}];
+        const SEARCH_KEYWORDS = ["رياضيات","كيمياء","علوم","اللغة الإنجليزية","اللغة العربية","كويزات","امتحانات نصفية","مذاكرات","أوراق عمل","اختبارات","تحليل","نهايات","دوال","أعداد عقدية","أشعة","عصبية","اختيار من متعدد"];
 
-        let navStack = [];             // مسار التصنيف الحالي (تصفح السنة/المادة/النوع) — فارغة = الجذر
-        let currentMode = 'tree';      // 'tree' | 'teacher-list' | 'teacher-files' | 'tree-all-files'
-        let currentTeacher = null;     // {key, name} عند currentMode === 'teacher-files'
+        let navStack = [];
+        let currentMode = 'tree';      // tree | teacher-list | teacher-files | tree-all-files | search
+        let currentTeacher = null;
+
+        // حالة المساعد الذكي — مُعرَّفة هنا مبكراً لأن معالج تسجيل الدخول أدناه
+        // يستخدمها، وقد يُستدعى فور تحميل الصفحة قبل الوصول لقسم المساعد.
+        let assistantProfile = null;      // {queries, subjects, files}
+        let chatHistory = [];             // [{role:'user'|'model', text}]
+        let chatBusy = false;
+        let chatRestored = false;
+
+        // ---------- أدوات نصية (تطبيع عربي يُحسّن البحث والمطابقة) ----------
+        function normalizeAr(s) {
+            return (s || '').toString().toLowerCase()
+                .replace(/[\u064B-\u0652\u0640]/g, '')
+                .replace(/[\u0623\u0625\u0622]/g, '\u0627')
+                .replace(/\u0629/g, '\u0647')
+                .replace(/\u0649/g, '\u064A');
+        }
+        function escapeHtml(s) {
+            return (s || '').toString().replace(/[&<>"']/g, ch => (
+                { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
+            ));
+        }
 
         function currentNode() {
             if (navStack.length === 0) return null;
@@ -401,12 +536,12 @@
         function fileCardHtml(fileId, file, subtitle) {
             const isFav = userFavorites[fileId] ? '\u2764\ufe0f' : '\ud83e\udd0d';
             const isViewed = userHistory[fileId] ? `<span class="viewed-badge">\u2713 تم العرض</span>` : '';
-            const safeName = file.name.replace(/'/g, "\\'");
-            const subtitleHtml = subtitle ? `<span style="font-size: 0.8rem; color: var(--primary-color); display: block; margin-bottom: 5px;">${subtitle}</span>` : '';
+            const safeName = (file.name || '').replace(/'/g, "\\'");
+            const subtitleHtml = subtitle ? `<span style="font-size: 0.8rem; color: var(--primary-color); display: block; margin-bottom: 5px;">${escapeHtml(subtitle)}</span>` : '';
             return `
                 <div class="file-card" id="card-${fileId}">
                     <div class="file-name" id="name-${fileId}">
-                        ${subtitleHtml}${isViewed} ${file.name}
+                        ${subtitleHtml}${isViewed} ${escapeHtml(file.name)}
                     </div>
                     <div class="file-actions">
                         <button class="fav-btn fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
@@ -416,19 +551,70 @@
             `;
         }
 
+        // ============================================================
+        // فهرس الملفات — يُحمَّل من Firebase مرة واحدة فقط ثم يُعاد استخدامه
+        // في البحث الآني وفي المساعد الذكي (بدل استعلام جديد مع كل حرف).
+        // ============================================================
+        let fileIndexPromise = null;
+        function getFileIndex() {
+            if (!fileIndexPromise) {
+                fileIndexPromise = get(ref(db, 'files')).then(snapshot => {
+                    const all = snapshot.val() || {};
+                    const out = [];
+                    Object.keys(all).forEach(cid => {
+                        const files = all[cid];
+                        if (!files || typeof files !== 'object') return;
+                        Object.keys(files).forEach(fid => {
+                            const f = files[fid];
+                            if (!f || !f.name) return;
+                            const path = breadcrumbText(Number(cid));
+                            out.push({
+                                id: fid, categoryId: Number(cid), name: f.name, url: f.url,
+                                summary: f.summary || '', teacher: f.teacher || '', qtype: f.qtype || '',
+                                path: path,
+                                _name: normalizeAr(f.name), _summary: normalizeAr(f.summary),
+                                _teacher: normalizeAr(f.teacher), _path: normalizeAr(path),
+                                _hay: normalizeAr([f.name, f.summary, f.teacher, path, f.qtype].filter(Boolean).join(' '))
+                            });
+                        });
+                    });
+                    return out;
+                }).catch(err => { fileIndexPromise = null; throw err; });
+            }
+            return fileIndexPromise;
+        }
+
+        // ============================================================
+        // تأثير التباعد والتقارب أثناء التمرير
+        // ============================================================
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let fxTicking = false;
+        function applyScrollFx() {
+            if (reduceMotion) return;
+            const vh = window.innerHeight || 800;
+            document.querySelectorAll('#files-list .file-card').forEach(card => {
+                const r = card.getBoundingClientRect();
+                if (r.bottom < -120 || r.top > vh + 120) return;
+                const center = r.top + r.height / 2;
+                const dist = Math.min(Math.abs(center - vh / 2) / (vh / 2), 1);
+                card.style.transform = 'scale(' + (1 - dist * 0.07).toFixed(3) + ')';
+                card.style.opacity = (1 - dist * 0.3).toFixed(2);
+            });
+        }
+        window.addEventListener('scroll', () => {
+            if (fxTicking) return;
+            fxTicking = true;
+            requestAnimationFrame(() => { applyScrollFx(); fxTicking = false; });
+        }, { passive: true });
+        window.addEventListener('resize', applyScrollFx);
+
         window.showScreen = function(screenId, pushToHistory = true) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             window.scrollTo({top: 0, behavior: 'smooth'});
-
-            if (pushToHistory) {
-                history.pushState({ screen: screenId }, "", "#" + screenId);
-            }
+            if (pushToHistory) history.pushState({ screen: screenId }, "", "#" + screenId);
         }
 
-        // ============================================================
-        // الرئيسية — تعيد أي وضع تصفح (شجرة/معلمين) إلى نقطة البداية تماماً
-        // ============================================================
         window.goHome = function(pushToHistory = true) {
             navStack = [];
             currentMode = 'tree';
@@ -436,9 +622,6 @@
             window.renderCurrentLevel(pushToHistory);
         }
 
-        // ============================================================
-        // التنقل بين التصنيفات (يحل محل openYearScreen / loadFiles القديمتين)
-        // ============================================================
         window.renderCurrentLevel = function(pushToHistory = true) {
             currentMode = 'tree';
             const node = currentNode();
@@ -451,22 +634,21 @@
                 loadFilesForCategory(node.id, false);
             }
 
-            if (pushToHistory) {
-                history.pushState({ screen: 'category-nav', mode: 'tree', stack: [...navStack] }, "", "");
-            }
+            if (pushToHistory) history.pushState({ screen: 'category-nav', mode: 'tree', stack: [...navStack] }, "", "");
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function renderCategoryButtons(children, node) {
+            const atRoot = navStack.length === 0;
             const breadcrumbEl = document.getElementById('category-breadcrumb');
-            if (navStack.length > 0) {
+            if (!atRoot) {
                 breadcrumbEl.innerText = breadcrumbText();
                 breadcrumbEl.style.display = 'block';
             } else {
                 breadcrumbEl.style.display = 'none';
             }
-            document.getElementById('category-back-btn').style.display = navStack.length > 0 ? 'block' : 'none';
-            document.getElementById('category-home-btn').style.display = navStack.length > 0 ? 'block' : 'none';
+            document.getElementById('category-back-btn').style.display = atRoot ? 'none' : 'block';
+            document.getElementById('category-home-btn').style.display = atRoot ? 'none' : 'block';
             document.getElementById('category-title').innerText = node ? node.name : 'تصفح الملفات حسب السنة';
 
             const container = document.getElementById('category-buttons');
@@ -479,16 +661,9 @@
                 container.appendChild(btn);
             });
 
-            // بالجذر تحديداً: أضف مدخلاً إضافياً للتصفح حسب المعلم، بجانب سنوات الشجرة
-            if (!node) {
-                const teacherBtn = document.createElement('button');
-                teacherBtn.className = 'btn';
-                teacherBtn.innerText = '\ud83d\udc68\u200d\ud83c\udfeb تصفح حسب المعلم';
-                teacherBtn.onclick = function() { window.enterTeacherMode(); };
-                container.appendChild(teacherBtn);
-            }
-
-            document.getElementById('show-all-files-btn').style.display = 'block';
+            // الزر العريض يتبادل: بالرئيسية "حسب المعلم"، وداخل أي فرع "كل الملفات هنا"
+            document.getElementById('teacher-mode-btn').style.display = atRoot ? 'block' : 'none';
+            document.getElementById('show-all-files-btn').style.display = atRoot ? 'none' : 'block';
         }
 
         window.goBackCategory = function() {
@@ -509,33 +684,27 @@
             listContainer.innerHTML = "";
             loader.style.display = "block";
             showScreen('files-screen', false);
-            if (pushToHistory) {
-                history.pushState({ screen: 'category-nav', mode: 'tree', stack: [...navStack] }, "", "");
-            }
+            if (pushToHistory) history.pushState({ screen: 'category-nav', mode: 'tree', stack: [...navStack] }, "", "");
 
             const filesRef = ref(db, `files/${categoryId}`);
             onValue(filesRef, (snapshot) => {
                 loader.style.display = "none";
                 const data = snapshot.val();
-
                 if (data) {
                     Object.keys(data).forEach(fileId => {
                         listContainer.innerHTML += fileCardHtml(fileId, data[fileId], null);
                     });
+                    applyScrollFx();
                 } else {
                     listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
                 }
             }, { onlyOnce: true });
         }
 
-        // ============================================================
-        // "عرض كل الملفات هنا" — يجمع كل ملفات كل الأوراق تحت التصنيف الحالي
-        // دفعة واحدة (أو كل الملفات إن كنا بالجذر)، بلا الحاجة للنزول ورقة ورقة
-        // ============================================================
         window.loadAllFilesInCurrentCategory = function(pushToHistory = true) {
             const node = currentNode();
             const label = node ? breadcrumbText() : 'كل الملفات';
-            const relevantIds = node ? new Set(collectDescendantLeafIds(node.id)) : null; // null = بلا تقييد (الجذر)
+            const relevantIds = node ? new Set(collectDescendantLeafIds(node.id)) : null;
 
             const listContainer = document.getElementById('files-list');
             const loader = document.getElementById('loader');
@@ -547,42 +716,24 @@
             listContainer.innerHTML = "";
             loader.style.display = "block";
             showScreen('files-screen', false);
-            if (pushToHistory) {
-                history.pushState({ screen: 'category-nav', mode: 'tree-all-files', stack: [...navStack] }, "", "");
-            }
+            if (pushToHistory) history.pushState({ screen: 'category-nav', mode: 'tree-all-files', stack: [...navStack] }, "", "");
 
-            const filesRootRef = ref(db, 'files');
-            get(filesRootRef).then((snapshot) => {
+            getFileIndex().then(index => {
                 loader.style.display = "none";
-                const allData = snapshot.val();
-                let found = false;
-
-                if (allData) {
-                    Object.keys(allData).forEach(categoryId => {
-                        if (relevantIds && !relevantIds.has(Number(categoryId))) return;
-                        const files = allData[categoryId];
-                        if (typeof files !== 'object') return;
-                        Object.keys(files).forEach(fileId => {
-                            found = true;
-                            const subtitle = relevantIds ? null : breadcrumbText(Number(categoryId));
-                            listContainer.innerHTML += fileCardHtml(fileId, files[fileId], subtitle);
-                        });
-                    });
-                }
-
-                if (!found) {
+                const matches = index.filter(f => !relevantIds || relevantIds.has(f.categoryId));
+                if (matches.length) {
+                    listContainer.innerHTML = matches
+                        .map(f => fileCardHtml(f.id, f, relevantIds ? null : f.path)).join('');
+                    applyScrollFx();
+                } else {
                     listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
                 }
-            }).catch((error) => {
+            }).catch(() => {
                 loader.style.display = "none";
                 listContainer.innerHTML = `<p style='padding:20px; color:red; font-weight:bold;'>حدث خطأ أثناء التحميل. يرجى التحقق من اتصالك بالإنترنت.</p>`;
-                console.error("خطأ:", error);
             });
         }
 
-        // ============================================================
-        // التصفح حسب المعلم
-        // ============================================================
         window.enterTeacherMode = function(pushToHistory = true) {
             currentMode = 'teacher-list';
             navStack = [];
@@ -591,6 +742,7 @@
             document.getElementById('category-back-btn').style.display = 'block';
             document.getElementById('category-home-btn').style.display = 'block';
             document.getElementById('category-title').innerText = 'تصفح حسب المعلم';
+            document.getElementById('teacher-mode-btn').style.display = 'none';
             document.getElementById('show-all-files-btn').style.display = 'none';
 
             const container = document.getElementById('category-buttons');
@@ -604,9 +756,7 @@
             });
 
             showScreen('category-screen', false);
-            if (pushToHistory) {
-                history.pushState({ screen: 'category-nav', mode: 'teacher-list' }, "", "");
-            }
+            if (pushToHistory) history.pushState({ screen: 'category-nav', mode: 'teacher-list' }, "", "");
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
@@ -619,14 +769,12 @@
 
             document.getElementById('dynamic-back-btn').onclick = function() { window.enterTeacherMode(); };
             document.getElementById('dynamic-back-btn').innerHTML = " &rarr; رجوع";
-            document.getElementById('files-title').innerText = '\u0627\u0644\u0623\u0633\u062a\u0627\u0630 ' + teacherName;
+            document.getElementById('files-title').innerText = 'الأستاذ ' + teacherName;
 
             listContainer.innerHTML = "";
             loader.style.display = "block";
             showScreen('files-screen', false);
-            if (pushToHistory) {
-                history.pushState({ screen: 'category-nav', mode: 'teacher-files', teacherKey, teacherName }, "", "");
-            }
+            if (pushToHistory) history.pushState({ screen: 'category-nav', mode: 'teacher-files', teacherKey, teacherName }, "", "");
 
             const filesRef = ref(db, `files_by_teacher/${teacherKey}`);
             onValue(filesRef, (snapshot) => {
@@ -638,61 +786,102 @@
                         const subtitle = file.categoryId !== undefined ? breadcrumbText(Number(file.categoryId)) : null;
                         listContainer.innerHTML += fileCardHtml(fileId, file, subtitle);
                     });
+                    applyScrollFx();
                 } else {
                     listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات لهذا المعلم بعد.</p>";
                 }
             }, { onlyOnce: true });
         }
 
-        window.executeSearch = function() {
-            const query = document.getElementById('search-input').value.trim().toLowerCase();
-            if(!query) return;
+        // ============================================================
+        // البحث الآني + الكلمات المفتاحية
+        // ============================================================
+        let searchTimer = null, searchSeq = 0, preSearchView = null;
+
+        function snapshotView() { return { mode: currentMode, stack: [...navStack], teacher: currentTeacher }; }
+
+        function restorePreSearchView() {
+            const snap = preSearchView;
+            preSearchView = null;
+            if (!snap || snap.mode === 'search') { window.goHome(false); return; }
+            if (snap.mode === 'teacher-list') { window.enterTeacherMode(false); return; }
+            if (snap.mode === 'teacher-files' && snap.teacher) {
+                window.loadFilesForTeacher(snap.teacher.key, snap.teacher.name, false); return;
+            }
+            navStack = snap.stack || [];
+            if (snap.mode === 'tree-all-files') { window.loadAllFilesInCurrentCategory(false); return; }
+            window.renderCurrentLevel(false);
+        }
+
+        window.onSearchInput = function(immediate = false) {
+            const q = document.getElementById('search-input').value.trim();
+            clearTimeout(searchTimer);
+            if (!q) { searchSeq++; restorePreSearchView(); return; }
+            if (q.length < 2 && !immediate) return;
+            if (immediate) runLiveSearch(q);
+            else searchTimer = setTimeout(() => runLiveSearch(q), 200);
+        }
+
+        function runLiveSearch(q) {
+            const seq = ++searchSeq;
+            if (currentMode !== 'search') preSearchView = snapshotView();
+            currentMode = 'search';
 
             const listContainer = document.getElementById('files-list');
             const loader = document.getElementById('loader');
-            
-            listContainer.innerHTML = ""; 
-            loader.style.display = "block"; 
-            
+
             document.getElementById('dynamic-back-btn').onclick = function() { window.goHome(); };
             document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
-            document.getElementById('files-title').innerText = "نتائج البحث عن: " + query;
-            
-            showScreen('files-screen');
+            document.getElementById('files-title').innerText = 'نتائج البحث عن: ' + q;
+            if (!document.getElementById('files-screen').classList.contains('active')) {
+                showScreen('files-screen', false);
+            }
+            loader.style.display = 'block';
 
-            const filesRootRef = ref(db, 'files');
-            get(filesRootRef).then((snapshot) => {
-                loader.style.display = "none";
-                const allData = snapshot.val();
-                let resultsFound = false;
-
-                if (allData) {
-                    Object.keys(allData).forEach(categoryId => {
-                        const files = allData[categoryId];
-                        if (typeof files !== 'object') return; 
-
-                        Object.keys(files).forEach(fileId => {
-                            const file = files[fileId];
-                            
-                            if (file && file.name && file.name.toLowerCase().includes(query)) {
-                                resultsFound = true;
-                                const crumb = breadcrumbText(Number(categoryId));
-                                listContainer.innerHTML += fileCardHtml(fileId, file, crumb);
-                            }
-                        });
-                    });
-                }
-
-                if (!resultsFound) {
-                    listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لم يتم العثور على ملفات تطابق بحثك.</p>";
-                }
-            }).catch((error) => {
-                loader.style.display = "none";
+            getFileIndex().then(index => {
+                if (seq !== searchSeq) return;   // المستخدم تابع الكتابة، هذه نتيجة قديمة
+                loader.style.display = 'none';
+                const terms = normalizeAr(q).split(/\s+/).filter(Boolean);
+                const results = index.filter(f => terms.every(t => f._hay.includes(t)));
+                document.getElementById('files-title').innerText =
+                    'نتائج البحث عن: ' + q + (results.length ? ' (' + results.length + ')' : '');
+                listContainer.innerHTML = results.length
+                    ? results.map(f => fileCardHtml(f.id, f, f.path)).join('')
+                    : "<p style='padding:20px; color:#666;'>لم يتم العثور على ملفات تطابق بحثك.</p>";
+                applyScrollFx();
+            }).catch(() => {
+                if (seq !== searchSeq) return;
+                loader.style.display = 'none';
                 listContainer.innerHTML = `<p style='padding:20px; color:red; font-weight:bold;'>حدث خطأ أثناء البحث. يرجى التحقق من اتصالك بالإنترنت.</p>`;
-                console.error("خطأ في البحث:", error);
             });
         }
 
+        window.showKeywords = function() {
+            document.getElementById('search-keywords').classList.add('show');
+        }
+        document.addEventListener('click', (e) => {
+            const box = document.getElementById('search-bar-container');
+            const kws = document.getElementById('search-keywords');
+            if (box && kws && !box.contains(e.target) && !kws.contains(e.target)) kws.classList.remove('show');
+        });
+        (function renderKeywordChips() {
+            const c = document.getElementById('search-keywords');
+            SEARCH_KEYWORDS.forEach(kw => {
+                const chip = document.createElement('button');
+                chip.className = 'kw-chip';
+                chip.type = 'button';
+                chip.innerText = kw;
+                chip.onclick = function() {
+                    document.getElementById('search-input').value = kw;
+                    window.onSearchInput(true);
+                };
+                c.appendChild(chip);
+            });
+        })();
+
+        // ============================================================
+        // الشريط الجانبي، المصادقة، المفضلة، السجل (كما هي دون تغيير جوهري)
+        // ============================================================
         window.toggleSidebar = function() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
@@ -707,14 +896,9 @@
                         acc[j].nextElementSibling.style.maxHeight = null;
                     }
                 }
-                
                 this.classList.toggle("active");
                 const panel = this.nextElementSibling;
-                if (panel.style.maxHeight) {
-                    panel.style.maxHeight = null;
-                } else {
-                    panel.style.maxHeight = panel.scrollHeight + "px";
-                }
+                panel.style.maxHeight = panel.style.maxHeight ? null : panel.scrollHeight + "px";
             });
         }
 
@@ -731,55 +915,47 @@
                 document.getElementById('user-menu').style.display = 'flex';
                 document.getElementById('user-pic').src = user.photoURL;
                 document.getElementById('user-name').innerText = user.displayName;
-                
+
                 const userRef = ref(db, `users/${user.uid}`);
                 onValue(userRef, (snapshot) => {
                     const data = snapshot.val() || {};
                     userFavorites = data.favorites || {};
                     userHistory = data.history || {};
                 });
+
+                loadAssistantState(user.uid);
             } else {
                 currentUser = null; userFavorites = {}; userHistory = {};
                 document.getElementById('login-btn').style.display = 'block';
                 document.getElementById('user-profile').style.display = 'none';
                 document.getElementById('user-menu').style.display = 'none';
+                assistantProfile = null;
             }
         });
 
         window.toggleFavorite = function(fileId, fileName, fileUrl) {
-            if (!currentUser) { 
-                showLoginPopup(); 
-                return; 
-            }
-            
+            if (!currentUser) { showLoginPopup(); return; }
             const favRef = ref(db, `users/${currentUser.uid}/favorites/${fileId}`);
             const favIcons = document.querySelectorAll(`.fav-icon-${fileId}`);
 
-            if (userFavorites[fileId]) { 
+            if (userFavorites[fileId]) {
                 remove(favRef);
-                delete userFavorites[fileId]; 
-                
+                delete userFavorites[fileId];
                 favIcons.forEach(icon => icon.innerText = '\ud83e\udd0d');
-
                 const cardToHide = document.getElementById(`card-${fileId}`);
                 if (cardToHide && document.getElementById('files-title').innerText === 'ملفاتي المفضلة') {
-                    cardToHide.style.display = 'none'; 
+                    cardToHide.style.display = 'none';
                 }
-            } 
-            else { 
+            } else {
                 set(favRef, { name: fileName, url: fileUrl });
                 userFavorites[fileId] = true;
-                
                 favIcons.forEach(icon => icon.innerText = '\u2764\ufe0f');
-            } 
+            }
         }
 
         window.markAsViewed = function(fileId, fileName, fileUrl) {
-            if (!currentUser) return; 
-
-            const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
-            set(historyRef, { name: fileName, url: fileUrl, timestamp: Date.now() });
-
+            if (!currentUser) return;
+            set(ref(db, `users/${currentUser.uid}/history/${fileId}`), { name: fileName, url: fileUrl, timestamp: Date.now() });
             const nameContainer = document.getElementById(`name-${fileId}`);
             if (nameContainer && !nameContainer.innerHTML.includes('viewed-badge')) {
                 nameContainer.innerHTML = `<span class="viewed-badge">\u2713 تم العرض</span> ` + nameContainer.innerHTML;
@@ -788,86 +964,336 @@
 
         window.removeFromHistory = function(fileId) {
             if (!currentUser) return;
-            const historyRef = ref(db, `users/${currentUser.uid}/history/${fileId}`);
-            
-            remove(historyRef).then(() => {
-                delete userHistory[fileId]; 
-                const cardToRemove = document.getElementById(`card-${fileId}`);
-                if (cardToRemove) {
-                    cardToRemove.style.display = 'none'; 
-                }
-            }).catch((error) => {
-                console.error("حدث خطأ أثناء الحذف:", error);
-            });
+            remove(ref(db, `users/${currentUser.uid}/history/${fileId}`)).then(() => {
+                delete userHistory[fileId];
+                const card = document.getElementById(`card-${fileId}`);
+                if (card) card.style.display = 'none';
+            }).catch((error) => console.error("حدث خطأ أثناء الحذف:", error));
         }
 
         window.showUserFiles = function(type) {
-            toggleSidebar(); 
+            toggleSidebar();
             const listContainer = document.getElementById('files-list');
             listContainer.innerHTML = "";
-            
             document.getElementById('files-title').innerText = type === 'favorites' ? 'ملفاتي المفضلة' : 'سجل الملفات المعروضة';
-            
             document.getElementById('dynamic-back-btn').onclick = function() { window.goHome(); };
             document.getElementById('dynamic-back-btn').innerHTML = " &rarr; العودة للرئيسية";
-
             showScreen('files-screen');
 
-            let data = type === 'favorites' ? userFavorites : userHistory;
-            
+            const data = type === 'favorites' ? userFavorites : userHistory;
             if (Object.keys(data).length > 0) {
-                let itemsArray = Object.keys(data).map(fileId => {
-                    return { id: fileId, ...data[fileId] };
-                });
-
-                if (type === 'history') {
-                    itemsArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                }
+                let itemsArray = Object.keys(data).map(fileId => ({ id: fileId, ...data[fileId] }));
+                if (type === 'history') itemsArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
                 itemsArray.forEach(file => {
                     const fileId = file.id;
                     const isFav = userFavorites[fileId] ? '\u2764\ufe0f' : '\ud83e\udd0d';
                     const isViewed = userHistory[fileId] ? `<span class="viewed-badge">\u2713 تم العرض</span>` : '';
-                    const safeName = file.name.replace(/'/g, "\\'");
-                    
-                    const deleteButton = type === 'history' 
-                        ? `<button class="delete-btn" title="حذف من السجل" onclick="removeFromHistory('${fileId}')">\ud83d\uddd1\ufe0f</button>` 
+                    const safeName = (file.name || '').replace(/'/g, "\\'");
+                    const deleteButton = type === 'history'
+                        ? `<button class="delete-btn" title="حذف من السجل" onclick="removeFromHistory('${fileId}')">\ud83d\uddd1\ufe0f</button>`
                         : '';
-
                     listContainer.innerHTML += `
                         <div class="file-card" id="card-${fileId}">
-                            <div class="file-name" id="name-${fileId}">${isViewed} ${file.name}</div>
+                            <div class="file-name" id="name-${fileId}">${isViewed} ${escapeHtml(file.name)}</div>
                             <div class="file-actions">
                                 ${deleteButton}
-                                <button class="fav-btn fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">
-                                    ${isFav}
-                                </button>
-                                <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">
-                                    فتح الملف
-                                </a>
+                                <button class="fav-btn fav-icon-${fileId}" onclick="toggleFavorite('${fileId}', '${safeName}', '${file.url}')">${isFav}</button>
+                                <a href="${file.url}" target="_blank" class="download-link" onclick="markAsViewed('${fileId}', '${safeName}', '${file.url}')">فتح الملف</a>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
+                applyScrollFx();
             } else {
                 listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
             }
         }
 
+        // ============================================================
+        //                     المساعد الذكي
+        // ============================================================
+
+        // ---------- توزيع الحِمل على عدة مفاتيح (نفس خوارزمية بوت التيليجرام) ----------
+        // المفاتيح تُقرأ من Firebase (config/gemini_keys) وليست مكتوبة داخل الصفحة،
+        // وقواعد Firebase تمنع قراءتها إلا بعد تسجيل الدخول.
+        let geminiKeys = null, keyIndex = 0;
+        const keyCooldown = {};
+        const KEY_COOLDOWN_MS = 60000;
+
+        async function loadGeminiKeys() {
+            if (geminiKeys) return geminiKeys;
+            const snapshot = await get(ref(db, 'config/gemini_keys'));
+            let val = snapshot.val();
+            if (!val) throw new Error('NO_KEYS');
+            if (!Array.isArray(val)) val = Object.values(val);
+            geminiKeys = val.filter(k => typeof k === 'string' && k.trim());
+            if (!geminiKeys.length) throw new Error('NO_KEYS');
+            return geminiKeys;
+        }
+
+        function pickKey(excluded) {
+            const n = geminiKeys.length, now = Date.now();
+            for (let i = 0; i < n; i++) {                    // مفتاح غير مستبعد وغير "مستريح"
+                const idx = (keyIndex + i) % n, k = geminiKeys[idx];
+                if (!excluded.has(k) && !(keyCooldown[k] && now < keyCooldown[k])) { keyIndex = (idx + 1) % n; return k; }
+            }
+            for (let i = 0; i < n; i++) {                    // وإلا أفضل بديل متاح بدل التوقف
+                const idx = (keyIndex + i) % n, k = geminiKeys[idx];
+                if (!excluded.has(k)) { keyIndex = (idx + 1) % n; return k; }
+            }
+            return null;
+        }
+
+        async function callGemini(body) {
+            await loadGeminiKeys();
+            const tried = new Set();
+            let lastError = null;
+            for (let attempt = 0; attempt < geminiKeys.length; attempt++) {
+                const key = pickKey(tried);
+                if (!key) break;
+                tried.add(key);
+                try {
+                    const res = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`,
+                        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+                    );
+                    if (res.ok) return await res.json();
+                    // 429 تجاوز حدّ، 403 مشكلة صلاحية → أرِح المفتاح وجرّب التالي فوراً
+                    if (res.status === 429 || res.status === 403) {
+                        keyCooldown[key] = Date.now() + KEY_COOLDOWN_MS;
+                        lastError = new Error('HTTP ' + res.status);
+                        continue;
+                    }
+                    throw new Error('HTTP ' + res.status);   // خطأ آخر: تبديل المفتاح لن يفيد
+                } catch (e) {
+                    lastError = e;
+                    if (!/HTTP (429|403)/.test(e.message || '')) throw e;
+                }
+            }
+            throw lastError || new Error('تعذّر الاتصال بالمساعد');
+        }
+
+        // ---------- استحضار الملفات المرشّحة (يعتمد على شرح كل ملف بقاعدة البيانات) ----------
+        function retrieveCandidates(index, queryText, limit) {
+            const terms = normalizeAr(queryText).split(/\s+/).filter(t => t.length > 2);
+            if (!terms.length) return [];
+            return index.map(f => {
+                let score = 0;
+                terms.forEach(t => {
+                    if (f._name.includes(t)) score += 3;
+                    if (f._teacher && f._teacher.includes(t)) score += 3;
+                    if (f._path.includes(t)) score += 2;
+                    if (f._summary.includes(t)) score += 1;
+                });
+                return { f, score };
+            }).filter(x => x.score > 0)
+              .sort((a, b) => b.score - a.score)
+              .slice(0, limit)
+              .map(x => x.f);
+        }
+
+        // ---------- ذاكرة الطالب ومحادثته (المتغيرات مُعرَّفة بأعلى الملف) ----------
+
+        function loadAssistantState(uid) {
+            get(ref(db, `users/${uid}/assistant`)).then(snap => {
+                const data = snap.val() || {};
+                assistantProfile = data.profile || { queries: [], subjects: {}, files: [] };
+                if (!chatRestored && Array.isArray(data.chat) && data.chat.length) {
+                    chatHistory = data.chat;
+                    const box = document.getElementById('chat-messages');
+                    box.innerHTML = '';
+                    chatHistory.forEach(m => appendMsg(m.role === 'user' ? 'user' : 'bot', m.text, false));
+                    chatRestored = true;
+                }
+            }).catch(() => { assistantProfile = { queries: [], subjects: {}, files: [] }; });
+        }
+
+        function saveAssistantState() {
+            if (!currentUser) return;
+            set(ref(db, `users/${currentUser.uid}/assistant`), {
+                profile: assistantProfile || { queries: [], subjects: {}, files: [] },
+                chat: chatHistory.slice(-20),
+                updatedAt: Date.now()
+            }).catch(() => {});
+        }
+
+        function updateAssistantProfile(userText, files) {
+            const p = assistantProfile || { queries: [], subjects: {}, files: [] };
+            p.queries = [...(p.queries || []), userText].slice(-10);
+            p.subjects = p.subjects || {};
+            p.files = p.files || [];
+            files.forEach(f => {
+                const parts = (f.path || '').split(' \u203a ');
+                if (parts[1]) p.subjects[parts[1]] = (p.subjects[parts[1]] || 0) + 1;
+                if (!p.files.includes(f.id)) p.files.push(f.id);
+            });
+            p.files = p.files.slice(-30);
+            assistantProfile = p;
+        }
+
+        function profileSummaryText() {
+            const p = assistantProfile;
+            if (!p) return '';
+            const subjects = Object.entries(p.subjects || {}).sort((a, b) => b[1] - a[1]).slice(0, 3).map(x => x[0]);
+            const bits = [];
+            if (subjects.length) bits.push('المواد التي يهتم بها عادةً: ' + subjects.join('، '));
+            if ((p.queries || []).length) bits.push('آخر ما سأل عنه: ' + p.queries.slice(-3).join(' / '));
+            return bits.length ? ('\n\nما نعرفه عن هذا الطالب من مرات سابقة (استفد منه بلباقة دون ذكره صراحة):\n- ' + bits.join('\n- ')) : '';
+        }
+
+        function buildSystemPrompt(candidates) {
+            let p = 'أنت "مساعد النبراس"، مساعد دراسي عربي ودود داخل موقع مكتبة ملفات فريق النبراس التطوعي '
+                  + '(نماذج وامتحانات ومذاكرات سابقة لطلاب معهد النبراس).\n'
+                  + 'أجب بالعربية الفصحى المبسّطة وباختصار مفيد. إن كان السؤال دراسياً عاماً فأجب عنه مباشرة.\n'
+                  + 'إن كان الطالب يبحث عن ملفات، فرشّح له من قائمة الملفات المتاحة أدناه فقط، ولا تخترع ملفات أو روابط غير موجودة فيها إطلاقاً.\n'
+                  + 'إذا لم تجد ملفاً مناسباً ضمن القائمة، قل ذلك بصراحة واقترح عليه كلمات بحث أفضل.\n'
+                  + 'عند ترشيح ملفات، اذكرها في جوابك بأسمائها، ثم أنهِ ردّك بسطر منفصل أخير بهذه الصيغة تماماً: FILES: معرّفات الملفات مفصولة بفواصل.';
+            if (candidates.length) {
+                p += '\n\nالملفات المتاحة ذات الصلة بسؤاله الآن:\n';
+                candidates.forEach(f => {
+                    p += `- [${f.id}] ${f.name} | التصنيف: ${f.path}`
+                       + (f.teacher ? ` | المعلم: ${f.teacher}` : '')
+                       + (f.qtype ? ` | نوع الأسئلة: ${f.qtype}` : '')
+                       + (f.summary ? `\n  الشرح: ${f.summary}` : '') + '\n';
+                });
+            } else {
+                p += '\n\n(لا توجد ملفات مطابقة لسؤاله الحالي في المكتبة.)';
+            }
+            return p + profileSummaryText();
+        }
+
+        // ---------- واجهة المحادثة ----------
+        window.openChat = function() {
+            document.getElementById('chat-panel').classList.add('open');
+            document.getElementById('chat-fab').classList.add('hidden');
+            if (!document.getElementById('chat-messages').children.length) {
+                appendMsg('bot', 'أهلاً بك \ud83d\udc4b أنا لبيبة، مساعدة رقمية\nاسألني عن أي مادة أو موضوع، وسأبحث لك في المكتبة عن الملفات المناسبة.', false);
+            }
+            setTimeout(() => document.getElementById('chat-input').focus(), 300);
+        }
+        window.closeChat = function() {
+            document.getElementById('chat-panel').classList.remove('open');
+            document.getElementById('chat-fab').classList.remove('hidden');
+        }
+        window.autoGrowChatInput = function(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+        }
+
+        function appendMsg(kind, text, scroll = true) {
+            const box = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'msg ' + kind;
+            div.innerText = text;
+            box.appendChild(div);
+            if (scroll) box.scrollTop = box.scrollHeight;
+            return div;
+        }
+
+        function appendChatFiles(files) {
+            const box = document.getElementById('chat-messages');
+            files.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'chat-file';
+                div.innerHTML = `<div class="cf-name"><span class="cf-path">${escapeHtml(f.path)}</span>${escapeHtml(f.name)}</div>`
+                              + `<a href="${f.url}" target="_blank" onclick="markAsViewed('${f.id}', '${(f.name || '').replace(/'/g, "\\'")}', '${f.url}')">فتح</a>`;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function showTyping() {
+            const box = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'msg bot typing';
+            div.id = 'typing-indicator';
+            div.innerHTML = '<span></span><span></span><span></span>';
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+        function hideTyping() {
+            const t = document.getElementById('typing-indicator');
+            if (t) t.remove();
+        }
+
+        window.sendChatMessage = async function() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || chatBusy) return;
+
+            // بوابة تسجيل الدخول: كل شيء متاح، ويتوقف هنا فقط (ونُبقي نصّه كما هو ليُرسله بعد الدخول)
+            if (!currentUser) {
+                appendMsg('note', 'لإرسال رسالتك إلى المساعد، يرجى تسجيل الدخول أولاً \ud83d\udd12');
+                showLoginPopup();
+                return;
+            }
+
+            input.value = '';
+            input.style.height = 'auto';
+            appendMsg('user', text);
+            chatHistory.push({ role: 'user', text });
+            chatBusy = true;
+            document.getElementById('chat-send').disabled = true;
+            showTyping();
+
+            try {
+                const index = await getFileIndex();
+                // نبني استعلام الاستحضار من آخر رسالتين للطالب، ليعمل مع أسئلة المتابعة القصيرة
+                const recentUserText = chatHistory.filter(m => m.role === 'user').slice(-2).map(m => m.text).join(' ');
+                const candidates = retrieveCandidates(index, recentUserText, 12);
+
+                const contents = chatHistory.slice(-10).map(m => ({
+                    role: m.role === 'user' ? 'user' : 'model',
+                    parts: [{ text: m.text }]
+                }));
+
+                const data = await callGemini({
+                    system_instruction: { parts: [{ text: buildSystemPrompt(candidates) }] },
+                    contents,
+                    generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }
+                });
+
+                const parts = (((data.candidates || [])[0] || {}).content || {}).parts || [];
+                let reply = parts.map(p => p.text || '').join('').trim();
+                if (!reply) throw new Error('EMPTY_REPLY');
+
+                // استخرج معرّفات الملفات التي رشّحها، ثم احذف ذلك السطر من نص الرد
+                let shown = [];
+                const m = reply.match(/FILES\s*:\s*([^\n]+)/i);
+                if (m) {
+                    const ids = m[1].split(/[,،\s]+/).map(s => s.trim()).filter(Boolean);
+                    shown = ids.map(id => candidates.find(f => f.id === id)).filter(Boolean);
+                    reply = reply.replace(m[0], '').trim();
+                }
+
+                hideTyping();
+                appendMsg('bot', reply);
+                if (shown.length) appendChatFiles(shown.slice(0, 5));
+
+                chatHistory.push({ role: 'model', text: reply });
+                updateAssistantProfile(text, shown.length ? shown : candidates.slice(0, 3));
+                saveAssistantState();
+            } catch (err) {
+                hideTyping();
+                const msg = (err && err.message) === 'NO_KEYS'
+                    ? 'المساعد غير مُفعَّل بعد: لم تُضَف مفاتيح Gemini في قاعدة البيانات (config/gemini_keys).'
+                    : 'تعذّر الوصول إلى المساعد حالياً. يرجى المحاولة بعد قليل.';
+                appendMsg('note', msg);
+                console.error('خطأ المساعد:', err);
+            } finally {
+                chatBusy = false;
+                document.getElementById('chat-send').disabled = false;
+            }
+        }
+
+        // ============================================================
         window.onpopstate = function(event) {
             const state = event.state;
             if (state && state.screen === 'category-nav') {
-                if (state.mode === 'teacher-list') {
-                    window.enterTeacherMode(false);
-                } else if (state.mode === 'teacher-files') {
-                    window.loadFilesForTeacher(state.teacherKey, state.teacherName, false);
-                } else if (state.mode === 'tree-all-files') {
-                    navStack = state.stack || [];
-                    window.loadAllFilesInCurrentCategory(false);
-                } else {
-                    navStack = state.stack || [];
-                    window.renderCurrentLevel(false);
-                }
+                if (state.mode === 'teacher-list') window.enterTeacherMode(false);
+                else if (state.mode === 'teacher-files') window.loadFilesForTeacher(state.teacherKey, state.teacherName, false);
+                else if (state.mode === 'tree-all-files') { navStack = state.stack || []; window.loadAllFilesInCurrentCategory(false); }
+                else { navStack = state.stack || []; window.renderCurrentLevel(false); }
             } else if (state && state.screen) {
                 showScreen(state.screen, false);
             } else {
@@ -881,27 +1307,18 @@
         };
 
         window.addEventListener('load', () => {
-            setTimeout(() => {
-                if (!currentUser) {
-                    document.getElementById('login-popup').classList.add('show');
-                }
-            }, 3000); 
+            setTimeout(() => { if (!currentUser) document.getElementById('login-popup').classList.add('show'); }, 3000);
         });
 
-        window.closeLoginPopup = function() {
-            document.getElementById('login-popup').classList.remove('show');
-        }
-
-        window.showLoginPopup = function() {
-            document.getElementById('login-popup').classList.add('show');
-        }
+        window.closeLoginPopup = function() { document.getElementById('login-popup').classList.remove('show'); }
+        window.showLoginPopup = function() { document.getElementById('login-popup').classList.add('show'); }
     </script>
     <div id="login-popup" class="glass-popup">
     <div class="popup-content">
         <button class="close-btn" onclick="closeLoginPopup()">&times;</button>
-        <div style="font-size: 40px; margin-bottom: 10px;">🔐</div>
+        <div style="font-size: 40px; margin-bottom: 10px;">\ud83d\udd12</div>
         <h3>تنبيه هام</h3>
-        <p>يرجى تسجيل الدخول لتتمكن من حفظ الملفات في المفضلة والاحتفاظ بسجل مشاهداتك.</p>
+        <p>يرجى تسجيل الدخول لتتمكن من حفظ الملفات في المفضلة والاحتفاظ بسجل مشاهداتك، ولاستخدام المساعد الذكي.</p>
         <button class="popup-login-btn" onclick="signInWithGoogle(); closeLoginPopup();">تسجيل الدخول باستخدام Google</button>
     </div>
 </div>
