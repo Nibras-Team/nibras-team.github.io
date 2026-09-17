@@ -1033,12 +1033,14 @@ window.signInWithGoogle = function() {
             }
             const val = snapshot.val();
             if (!val) throw new Error('NO_KEYS');
-            // نتسامح مع أي شكل تخزين شائع: مصفوفة مباشرة، أو عقدة Firebase برقم تسلسلي (0,1,2..)،
-            // أو تعشيش زائد بالخطأ مثل { gemini_keys: [...] } — نُسطّح أي عمق بدل الاكتفاء بمستوى واحد
+            // نتسامح مع أي شكل تخزين (مصفوفة، كائن متعشّش، أو حتى نص خام فيه JSON مكسور بفاصلة/قوس زائد):
+            // نجمع كل النصوص أياً كان عمق التعشيش، ثم نستخرج منها فقط ما يُطابق شكل مفتاح Gemini الحقيقي
+            // بدل افتراض أن القيمة كاملة = المفتاح — وهذا بالضبط ما كان يُرسل نصاً طويلاً مشوَّهاً كمفتاح
             const flatten = v => Array.isArray(v) ? v.flatMap(flatten)
                                 : (v && typeof v === 'object') ? Object.values(v).flatMap(flatten)
-                                : [v];
-            geminiKeys = flatten(val).filter(k => typeof k === 'string' && k.trim());
+                                : [String(v)];
+            const KEY_RE = /AQ\.[\w.-]{15,}|AIzaSy[\w-]{20,}/g;
+            geminiKeys = flatten(val).flatMap(s => s.match(KEY_RE) || []);
             if (!geminiKeys.length) throw new Error('NO_KEYS');
             console.info('تم تحميل مفاتيح Gemini:', geminiKeys.length, geminiKeys.map(k => k.slice(0, 6) + '…' + k.slice(-4)));
             return geminiKeys;
