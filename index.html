@@ -852,6 +852,11 @@
             else searchTimer = setTimeout(() => runLiveSearch(q), 200);
         }
 
+        // تأخير بسيط قبل إظهار النتائج، حتى يظهر مؤشر التحميل بشكل واضح
+        // ويشعر المستخدم بأن البحث يجلب بيانات فعلية لا نتيجة جاهزة فوراً
+        const SEARCH_MIN_DELAY_MS = 600; // عدّل هذا الرقم لتقصير أو إطالة مدة البحث الظاهرة
+        function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
         function runLiveSearch(q) {
             const seq = ++searchSeq;
             if (currentMode !== 'search') preSearchView = snapshotView();
@@ -868,7 +873,7 @@
             }
             loader.style.display = 'block';
 
-            getFileIndex().then(index => {
+            Promise.all([getFileIndex(), wait(SEARCH_MIN_DELAY_MS)]).then(([index]) => {
                 if (seq !== searchSeq) return;   // المستخدم تابع الكتابة، هذه نتيجة قديمة
                 loader.style.display = 'none';
                 const terms = normalizeAr(q).split(/\s+/).filter(Boolean);
