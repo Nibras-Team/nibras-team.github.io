@@ -868,8 +868,14 @@
             }
             loader.style.display = 'block';
 
-            getFileIndex().then(index => {
-                if (seq !== searchSeq) return;   // المستخدم تابع الكتابة، هذه نتيجة قديمة
+getFileIndex().then(index => {
+            if (seq !== searchSeq) return;   // المستخدم تابع الكتابة، هذه نتيجة قديمة
+            
+            // إضافة تأخير متعمد لمدة نصف ثانية (500 مللي ثانية)
+            setTimeout(() => {
+                // التحقق مرة أخرى لضمان عدم كتابة المستخدم لحرف جديد أثناء فترة التأخير
+                if (seq !== searchSeq) return; 
+                
                 loader.style.display = 'none';
                 const terms = normalizeAr(q).split(/\s+/).filter(Boolean);
                 const results = index.filter(f => terms.every(t => f._hay.includes(t)));
