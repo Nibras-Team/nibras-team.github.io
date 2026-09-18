@@ -1065,7 +1065,7 @@ window.signInWithGoogle = function() {
         // داخل الـ Worker فقط، وهو من يتولى الآن تدوير المفاتيح وإعادة المحاولة
         // عند 429/403 (نفس منطق ما كان هنا سابقاً، لكن منقول بالكامل إلى الخادم).
         // السطر الوحيد الذي يلزم تعديله هنا بعد نشر الـ Worker هو WORKER_URL أدناه.
-        const WORKER_URL = "https://nibras-gemini-proxy.nibras.ghzawimaher59.workers.dev";
+        const WORKER_URL = "https://nibras.ghzawimaher59.workers.dev/";
 
         async function callGemini(body) {
             const res = await fetch(WORKER_URL, {
