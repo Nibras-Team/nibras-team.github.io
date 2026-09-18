@@ -492,8 +492,8 @@
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' }); // لإظهار مُنتقي حسابات Google دائماً، كي يستطيع المستخدم تبديل حسابه بسهولة
 
-        // اسم نموذج Gemini المستخدم للمساعد — لتغييره لاحقاً عدّل هذا السطر وحده فقط.
-        const GEMINI_MODEL = "gemini-3.5-flash-lite";
+        // اسم نموذج Gemini لم يعد يُحدَّد هنا — انتقل مع استدعاء Gemini نفسه
+        // إلى داخل كود الـ Worker (ثابت GEMINI_MODEL في worker.js).
 
         let currentUser = null; 
         let userFavorites = {}; 
@@ -854,7 +854,7 @@
 
         // تأخير بسيط قبل إظهار النتائج، حتى يظهر مؤشر التحميل بشكل واضح
         // ويشعر المستخدم بأن البحث يجلب بيانات فعلية لا نتيجة جاهزة فوراً
-        const SEARCH_MIN_DELAY_MS = 1000; // عدّل هذا الرقم لتقصير أو إطالة مدة البحث الظاهرة
+        const SEARCH_MIN_DELAY_MS = 600; // عدّل هذا الرقم لتقصير أو إطالة مدة البحث الظاهرة
         function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
         function runLiveSearch(q) {
@@ -1060,94 +1060,25 @@ window.signInWithGoogle = function() {
         //                     المساعد الذكي
         // ============================================================
 
-        // ---------- توزيع الحِمل على عدة مفاتيح (نفس خوارزمية بوت التيليجرام) ----------
-        // المفاتيح تُقرأ من Firebase (config/gemini_keys) وليست مكتوبة داخل الصفحة،
-        // وقواعد Firebase تمنع قراءتها إلا بعد تسجيل الدخول.
-        let geminiKeys = null, keyIndex = 0;
-        const keyCooldown = {};
-        const KEY_COOLDOWN_MS = 60000;
-
-        async function loadGeminiKeys() {
-            if (geminiKeys) return geminiKeys;
-            let snapshot;
-            try {
-                snapshot = await get(ref(db, 'config/gemini_keys'));
-            } catch (e) {
-                // غالباً "Permission denied" من قواعد Firebase إن لم يكن تسجيل الدخول سليماً
-                throw new Error('FIREBASE_READ_FAILED: ' + (e && e.message ? e.message : e));
-            }
-            const val = snapshot.val();
-            if (!val) throw new Error('NO_KEYS');
-            // نتسامح مع أي شكل تخزين (مصفوفة، كائن متعشّش، أو حتى نص خام فيه JSON مكسور بفاصلة/قوس زائد):
-            // نجمع كل النصوص أياً كان عمق التعشيش، ثم نستخرج منها فقط ما يُطابق شكل مفتاح Gemini الحقيقي
-            // بدل افتراض أن القيمة كاملة = المفتاح — وهذا بالضبط ما كان يُرسل نصاً طويلاً مشوَّهاً كمفتاح
-            const flatten = v => Array.isArray(v) ? v.flatMap(flatten)
-                                : (v && typeof v === 'object') ? Object.values(v).flatMap(flatten)
-                                : [String(v)];
-            const KEY_RE = /AQ\.[\w.-]{15,}|AIzaSy[\w-]{20,}/g;
-            geminiKeys = flatten(val).flatMap(s => s.match(KEY_RE) || []);
-            if (!geminiKeys.length) throw new Error('NO_KEYS');
-            console.info('تم تحميل مفاتيح Gemini:', geminiKeys.length, geminiKeys.map(k => k.slice(0, 6) + '…' + k.slice(-4)));
-            return geminiKeys;
-        }
-
-        function pickKey(excluded) {
-            const n = geminiKeys.length, now = Date.now();
-            for (let i = 0; i < n; i++) {                    // مفتاح غير مستبعد وغير "مستريح"
-                const idx = (keyIndex + i) % n, k = geminiKeys[idx];
-                if (!excluded.has(k) && !(keyCooldown[k] && now < keyCooldown[k])) { keyIndex = (idx + 1) % n; return k; }
-            }
-            for (let i = 0; i < n; i++) {                    // وإلا أفضل بديل متاح بدل التوقف
-                const idx = (keyIndex + i) % n, k = geminiKeys[idx];
-                if (!excluded.has(k)) { keyIndex = (idx + 1) % n; return k; }
-            }
-            return null;
-        }
-
-        // يقرأ رسالة الخطأ الفعلية من جسم استجابة Gemini (عادة {error:{message, status, code}})
-        // بدل الاكتفاء برمز HTTP وحده، حتى نعرف السبب الحقيقي (مفتاح غير صالح، طلب غير صحيح، حصة منتهية...)
-        async function readErrorDetail(res) {
-            let rawText = '';
-            try { rawText = await res.text(); } catch (_) { return ''; }
-            try {
-                const parsed = JSON.parse(rawText);
-                return (parsed && parsed.error && parsed.error.message) ? parsed.error.message : rawText;
-            } catch (_) {
-                return rawText;
-            }
-        }
+        // ---------- الاتصال بالمساعد عبر Cloudflare Worker ----------
+        // مفاتيح Gemini الحقيقية لم تعد تمرّ بالمتصفح إطلاقاً: هي أسرار (Secrets)
+        // داخل الـ Worker فقط، وهو من يتولى الآن تدوير المفاتيح وإعادة المحاولة
+        // عند 429/403 (نفس منطق ما كان هنا سابقاً، لكن منقول بالكامل إلى الخادم).
+        // السطر الوحيد الذي يلزم تعديله هنا بعد نشر الـ Worker هو WORKER_URL أدناه.
+        const WORKER_URL = "https://nibras-gemini-proxy.YOUR-SUBDOMAIN.workers.dev";
 
         async function callGemini(body) {
-            await loadGeminiKeys();
-            const tried = new Set();
-            let lastError = null;
-            for (let attempt = 0; attempt < geminiKeys.length; attempt++) {
-                const key = pickKey(tried);
-                if (!key) break;
-                tried.add(key);
-                try {
-                    const res = await fetch(
-                        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`,
-                        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-                    );
-                    if (res.ok) return await res.json();
-
-                    const detail = await readErrorDetail(res);
-                    const httpErr = new Error('HTTP ' + res.status + (detail ? ' — ' + detail : ''));
-
-                    // 429 تجاوز حدّ، 403 مشكلة صلاحية → أرِح المفتاح وجرّب التالي فوراً
-                    if (res.status === 429 || res.status === 403) {
-                        keyCooldown[key] = Date.now() + KEY_COOLDOWN_MS;
-                        lastError = httpErr;
-                        continue;
-                    }
-                    throw httpErr;   // خطأ آخر: تبديل المفتاح لن يفيد
-                } catch (e) {
-                    lastError = e;
-                    if (!/HTTP (429|403)/.test(e.message || '')) throw e;
-                }
+            const res = await fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                const detail = (data && data.error && data.error.message) || ('HTTP ' + res.status);
+                throw new Error(detail);
             }
-            throw lastError || new Error('تعذّر الاتصال بالمساعد');
+            return data;
         }
 
         // ---------- استحضار الملفات المرشّحة (يعتمد على شرح كل ملف بقاعدة البيانات) ----------
@@ -1369,7 +1300,7 @@ window.signInWithGoogle = function() {
                 hideTyping();
                 const detail = (err && err.message) || String(err);
                 const msg = detail === 'NO_KEYS'
-                    ? 'المساعد غير مُفعَّل بعد: لم تُضَف مفاتيح Gemini في قاعدة البيانات (config/gemini_keys).'
+                    ? 'المساعد غير مُفعَّل بعد: لم تُضَف مفاتيح Gemini في إعدادات الـ Worker (GEMINI_API_KEYS).'
                     : 'تعذّر الوصول إلى المساعد حالياً.\nتفاصيل الخطأ: ' + detail;
                 appendMsg('note', msg);
                 console.error('خطأ المساعد الكامل:', err);
