@@ -853,22 +853,29 @@
         }
 
 function runLiveSearch(q) {
+        // 1. التقاط عنصر التحميل الجديد بناءً على الـ ID لضمان عدم حدوث خطأ
+        const loader = document.getElementById('loader'); 
+        
         if (!q) {
             renderFileList(currentCategoryFiles);
             return;
         }
+        
         const seq = ++searchSeq;
-        loader.style.display = 'block';
+        
+        // التأكد من وجود العنصر قبل تعديل خصائصه لتفادي توقف الكود
+        if (loader) loader.style.display = 'block'; 
         fileListEl.innerHTML = '';
         
         getFileIndex().then(index => {
             if (seq !== searchSeq) return;   
             
-            // تأخير متعمد لكي تظهر عجلة التحميل ويشعر المستخدم بالبحث
+            // تأخير متعمد (نصف ثانية) لرؤية دوران الصورة
             setTimeout(() => {
                 if (seq !== searchSeq) return; 
                 
-                loader.style.display = 'none';
+                if (loader) loader.style.display = 'none';
+                
                 const terms = normalizeAr(q).split(/\s+/).filter(Boolean);
                 const results = index.filter(f => terms.every(t => f._hay.includes(t)));
                 
@@ -877,11 +884,13 @@ function runLiveSearch(q) {
                 } else {
                     renderFileList(results, false);
                 }
-            }, 600); // 600 تعني 0.6 ثانية. يمكنك زيادتها (مثلاً 1000 لثانية كاملة) أو إنقاصها حسب رغبتك.
+            }, 500); // 500 مللي ثانية (نصف ثانية)
+            
         }).catch(err => {
             if (seq !== searchSeq) return;
-            loader.style.display = 'none';
-            fileListEl.innerHTML = '<div class="error">خطأ في البحث.</div>';
+            if (loader) loader.style.display = 'none';
+            fileListEl.innerHTML = '<div class="error">حدث خطأ أثناء البحث.</div>';
+            console.error("Search error:", err); // لطباعة الخطأ في الكونسول لمعرفة سببه إن وجد
         });
     }
 
