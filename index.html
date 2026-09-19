@@ -5,8 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فريق النبراس التطوعي - مكتبة الملفات</title>
     <link rel="icon" href="note_0525_131006899.png " sizes="any">
+    <!-- تحميل مبكر لخط Cocon Next Arabic: يبدأ التنزيل فور قراءة الصفحة (الملف بجانب index.html) -->
+    <link rel="preload" href="CoconNextArabic-Light.woff2" as="font" type="font/woff2" crossorigin>
 
     <style>
+        /* ===================== الخط: Cocon Next Arabic (وزن Light) ===================== */
+        /* اسم الملف حساس لحالة الأحرف على GitHub Pages: يجب أن يطابق CoconNextArabic-Light.woff2 تماماً */
+        @font-face {
+            font-family: 'Cocon Next Arabic';
+            src: url('CoconNextArabic-Light.woff2') format('woff2');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+
         :root {
             --primary-color: #1e3799; 
             --accent-color: #f6b93b;  
@@ -14,9 +26,11 @@
             --white: #ffffff;
             --text-dark: #2f3542;
             --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --site-font: 'Cocon Next Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* خط الموقع (الحروف الناقصة تنزل تلقائياً للخطوط التالية) */
+            --system-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* الخط الأصلي: لرسائل المحادثة مع المساعد */
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--site-font); }
         body { background-color: var(--bg-color); color: var(--text-dark); min-height: 100vh; }
 
         /* --- تصميم البار العلوي والبحث الجديد --- */
@@ -351,6 +365,8 @@
         .chat-header-delete:hover { opacity: 1; transform: translateY(-1px); background: rgba(255,255,255,0.28) !important; }
 
         .chat-messages { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+        /* رسائل المحادثة مع المساعد (الفقاعات + بطاقات الملفات + مؤشر الكتابة) تبقى بالخط الأصلي، وباقي الموقع بخط Cocon */
+        .chat-messages, .chat-messages * { font-family: var(--system-font); }
         .msg {
             max-width: 85%; padding: 12px 16px; border-radius: 16px; line-height: 1.75;
             white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; font-size: 0.98rem;
@@ -1487,7 +1503,7 @@ window.signInWithGoogle = function() {
                 if (navLogo.classList.contains('intro-revealed')) { obs.disconnect(); go(); }
             });
             obs.observe(navLogo, { attributes: true, attributeFilter: ['class'] });
-            setTimeout(() => { obs.disconnect(); maybeShowChatHint(); }, 7000); // شبكة أمان لو تعطّلت مقدّمة الشعار
+            setTimeout(() => { obs.disconnect(); maybeShowChatHint(); }, 15000); // شبكة أمان لو تعطّلت مقدّمة الشعار (أطول من أقصى انتظار للمقدّمة)
         }
         window.addEventListener('load', scheduleChatHint);
         window.autoGrowChatInput = function(el) {
@@ -1907,7 +1923,33 @@ window.signInWithGoogle = function() {
             navLogo.classList.add('intro-revealed');
             if (overlay && overlay.parentNode) overlay.remove();
           }
-          var safety = setTimeout(forceFinish, 9000);
+
+          // ---- بوّابة الجاهزية: يبقى الشعار في مكانه ولا ينتقل للأعلى حتى تكتمل هذه العناصر ----
+          //   1) خط Cocon Next Arabic   2) صور أجزاء شعار المقدّمة   3) شعار الشريط العلوي (وجهة الانتقال)
+          // لو تأخّر أي عنصر أكثر من MAX_HOLD_MS (أو فشل تحميله) نكمل بدونه حتى لا تعلق الشاشة.
+          var MAX_HOLD_MS = 10000;
+          var safety = setTimeout(forceFinish, MAX_HOLD_MS + 4000);
+
+          function imgReady(img) {
+            return new Promise(function (resolve) {
+              function decoded() { (img.decode ? img.decode() : Promise.resolve()).then(resolve, resolve); }
+              if (img.complete) { decoded(); return; }
+              img.addEventListener('load', decoded, { once: true });
+              img.addEventListener('error', resolve, { once: true });
+            });
+          }
+          function fontReady() {
+            if (!document.fonts || !document.fonts.load) return Promise.resolve();
+            return document.fonts.load('300 1em "Cocon Next Arabic"', 'أبجد هوز')
+              .then(function () { return document.fonts.ready; })
+              .catch(function () {});
+          }
+          var assets = [fontReady(), imgReady(navLogo)];
+          Array.prototype.forEach.call(logoGroup.querySelectorAll('img'), function (im) { assets.push(imgReady(im)); });
+          var gate = Promise.race([
+            Promise.all(assets),
+            new Promise(function (resolve) { setTimeout(resolve, MAX_HOLD_MS); })
+          ]);
 
           logoGroup.addEventListener('animationend', function onSettle(e) {
             if (e.animationName !== 'intro-settle') return;
@@ -1915,7 +1957,10 @@ window.signInWithGoogle = function() {
             if (finished) return;
             logoGroup.style.animation = 'none';
             logoGroup.style.transform = 'scale(1)';
-            requestAnimationFrame(function () { setTimeout(runDock, 130); });
+            gate.then(function () {
+              if (finished) return;
+              requestAnimationFrame(function () { setTimeout(runDock, 130); });
+            });
           });
 
           function runDock() {
