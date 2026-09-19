@@ -299,6 +299,32 @@
         }
         @keyframes chatFabRipple { to { transform: translate(-50%, -50%) scale(2.3); opacity: 0; } }
 
+        /* فقاعة تعريفية تنبثق من زر المساعد قبل الضغط عليه، لتشرح وظيفته */
+        #chat-fab-hint {
+            position: fixed; left: 18px; bottom: 96px; z-index: 1190;
+            max-width: min(78vw, 280px);
+            background: var(--white); color: var(--text-dark);
+            border-radius: 16px; border-bottom-left-radius: 4px;
+            padding: 12px 14px; box-shadow: 0 8px 24px rgba(30, 55, 153, 0.22);
+            font-size: 0.88rem; line-height: 1.6; text-align: right;
+            opacity: 0; transform: translateY(10px) scale(0.92); transform-origin: bottom left;
+            pointer-events: none;
+            transition: opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.25s ease;
+        }
+        #chat-fab-hint.show { opacity: 1; transform: none; pointer-events: auto; }
+        #chat-fab-hint::after {
+            content: ''; position: absolute; left: 22px; bottom: -8px;
+            width: 16px; height: 16px; background: var(--white);
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+        }
+        #chat-fab-hint .hint-close {
+            position: absolute; top: 4px; left: 6px; background: none; border: none;
+            color: #aab0c0; font-size: 1.05rem; line-height: 1; cursor: pointer; padding: 4px;
+        }
+        #chat-fab-hint .hint-close:hover { color: var(--text-dark); }
+        #chat-fab-hint p { padding-left: 16px; white-space: pre-wrap; }
+        @media (prefers-reduced-motion: reduce) { #chat-fab-hint { transition: opacity 0.35s ease; } }
+
         #chat-panel {
             position: fixed; inset: 0; background: var(--bg-color); z-index: 1300;
             display: flex; flex-direction: column;
@@ -316,6 +342,9 @@
         }
         .chat-header h3 { font-size: 1.15rem; font-weight: bold; }
         .chat-header button { background: none; border: none; color: var(--white); font-size: 1.6rem; cursor: pointer; line-height: 1; }
+        .chat-header-actions { display: flex; align-items: center; gap: 14px; }
+        .chat-header-delete { font-size: 1.1rem !important; opacity: 0.9; transition: opacity 0.2s, transform 0.2s; }
+        .chat-header-delete:hover { opacity: 1; transform: scale(1.1); }
 
         .chat-messages { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
         .msg {
@@ -327,6 +356,40 @@
         .msg.user { align-self: flex-end; background: var(--primary-color); color: var(--white); border-bottom-left-radius: 4px; }
         .msg.bot { align-self: flex-start; background: var(--white); color: var(--text-dark); border-bottom-right-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .msg.note { align-self: center; background: #fff4d6; color: #8a6d1f; font-size: 0.9rem; text-align: center; max-width: 95%; }
+
+        /* ---- إيماءات الرسائل: سحب للداخل = رد، ضغط مطوّل = حذف ---- */
+        .msg.user, .msg.bot { position: relative; touch-action: pan-y; }
+        .msg.user.pressing, .msg.bot.pressing { user-select: none; }
+        .msg.user::before, .msg.bot::before {
+            content: '\21a9'; position: absolute; top: 50%; transform: translateY(-50%) scale(0.5);
+            font-size: 1.15rem; color: var(--primary-color); opacity: 0; background: var(--white);
+            width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: opacity 0.15s ease, transform 0.15s ease; pointer-events: none;
+        }
+        .msg.user::before { left: 100%; margin-left: 8px; }
+        .msg.bot::before  { right: 100%; margin-right: 8px; }
+        .msg.reply-ready::before { opacity: 1; transform: translateY(-50%) scale(1); }
+        .msg.user::after, .msg.bot::after {
+            content: ''; position: absolute; inset: 0; border-radius: inherit;
+            background: rgba(231, 76, 60, 0); pointer-events: none; transition: background 0.15s ease;
+        }
+        .msg.pressing::after { background: rgba(231, 76, 60, 0.4); transition: background 0.55s linear; }
+
+        .msg-reply-quote { font-size: 0.8rem; opacity: 0.9; padding: 6px 10px; margin-bottom: 8px; border-radius: 8px; max-height: 4.6em; overflow: hidden; }
+        .msg.user .msg-reply-quote { background: rgba(255,255,255,0.18); border-right: 3px solid rgba(255,255,255,0.65); }
+        .msg.bot .msg-reply-quote { background: rgba(30,55,153,0.07); border-right: 3px solid var(--primary-color); color: var(--primary-color); }
+
+        .reply-preview-bar {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            background: var(--bg-color); border-top: 3px solid var(--accent-color);
+            padding: 10px 16px; flex-shrink: 0;
+        }
+        .reply-preview-text { font-size: 0.85rem; color: var(--text-dark); overflow: hidden; }
+        .reply-preview-text strong { color: var(--primary-color); display: block; font-size: 0.78rem; margin-bottom: 2px; }
+        .reply-preview-text div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .reply-preview-cancel { background: none; border: none; font-size: 1.4rem; color: #8a8f9c; cursor: pointer; line-height: 1; flex-shrink: 0; }
+        .reply-preview-cancel:hover { color: var(--text-dark); }
 
         .chat-file {
             display: flex; justify-content: space-between; align-items: center; gap: 10px;
@@ -377,7 +440,7 @@
       #intro-logo-group {
         position: relative;
         width: min(78vw, 620px);
-        aspect-ratio: 615 / 119;
+        aspect-ratio: 545 / 119;
         overflow: hidden;
         transform: scale(.97);
         transform-origin: 50% 50%;
@@ -388,7 +451,7 @@
         100% { transform: scale(1); }
       }
 
-      .intro-symbol-wrap { position: absolute; left: 79.675%; top: 0%; width: 20.325%; height: 100%; }
+      .intro-symbol-wrap { position: absolute; left: 77.065%; top: 0%; width: 22.935%; height: 100%; }
       .intro-piece {
         position: absolute; transform: translate(-50%,-50%);
         opacity: 0; object-fit: contain; pointer-events: none;
@@ -412,11 +475,11 @@
         position: absolute; clip-path: inset(0 0 0 100%);
       }
       .intro-arabic-wrap {
-        left: 0%; top: 6.7%; width: 77.9%; height: 39.5%;
+        left: 0%; top: 6.7%; width: 87.887%; height: 39.5%;
         animation: intro-reveal-clip-rtl 0.75s cubic-bezier(.4,.05,.2,1) 2.36s both;
       }
       .intro-english-wrap {
-        left: 1.3%; top: 67.2%; width: 75.6%; height: 26.1%;
+        left: 1.468%; top: 67.2%; width: 85.3%; height: 26.1%;
         animation: intro-reveal-clip-ltr 0.65s cubic-bezier(.4,.05,.2,1) 2.96s both;
       }
       .intro-arabic-wrap img, .intro-english-wrap img {
@@ -604,11 +667,19 @@
     </main>
 
     <button id="chat-fab" onclick="window.openChat()" title="المساعد الذكي" aria-label="المساعد الذكي"><span class="chat-fab-icon">🤖</span></button>
+    <div id="chat-fab-hint" role="status">
+        <button class="hint-close" onclick="window.dismissChatHint()" aria-label="إغلاق">&times;</button>
+        <p>أهلاً بك 👋 أنا لبيبة، مساعدة رقمية
+اسألني عن أي مادة أو موضوع، وسأبحث لك في المكتبة عن الملفات المناسبة.</p>
+    </div>
 
     <div id="chat-panel" role="dialog" aria-label="المساعد الذكي">
         <div class="chat-header">
             <h3>🤖 مساعد النبراس</h3>
-            <button onclick="window.closeChat()" title="تصغير" aria-label="تصغير">&times;</button>
+            <div class="chat-header-actions">
+                <button class="chat-header-delete" onclick="window.deleteEntireChat()" title="حذف المحادثة" aria-label="حذف المحادثة">🗑️</button>
+                <button onclick="window.closeChat()" title="تصغير" aria-label="تصغير">&times;</button>
+            </div>
         </div>
         <div id="chat-messages" class="chat-messages"></div>
         <div class="chat-input-bar">
@@ -671,9 +742,13 @@
         // حالة المساعد الذكي — مُعرَّفة هنا مبكراً لأن معالج تسجيل الدخول أدناه
         // يستخدمها، وقد يُستدعى فور تحميل الصفحة قبل الوصول لقسم المساعد.
         let assistantProfile = null;      // {queries, subjects, files}
-        let chatHistory = [];             // [{role:'user'|'model', text}]
+        let chatHistory = [];             // [{role:'user'|'model', text, id, replyTo?:{role,text}}]
         let chatBusy = false;
         let chatRestored = false;
+        let msgIdSeed = 0;
+        function newMsgId() { return 'm' + Date.now().toString(36) + (msgIdSeed++).toString(36); }
+        let pendingReplyTo = null;        // {id, role, text} الرسالة التي يجري الرد عليها حالياً
+        const CHAT_GREETING = 'أهلاً بك \ud83d\udc4b أنا لبيبة، مساعدة رقمية\nاسألني عن أي مادة أو موضوع، وسأبحث لك في المكتبة عن الملفات المناسبة.';
 
         // ---------- أدوات نصية (تطبيع عربي يُحسّن البحث والمطابقة) ----------
         function normalizeAr(s) {
@@ -1099,7 +1174,11 @@ window.signInWithGoogle = function() {
         window.location.reload(); // تحديث الموقع بالكامل عند تسجيل الدخول أو تبديل الحساب، ليعكس بيانات الحساب الجديد (المفضلة، السجل، المحادثة) بدل بقاء أثر الحساب السابق ظاهراً
     }).catch(error => alert("حدث خطأ أثناء تسجيل الدخول: " + error.message));
 }
-        window.logout = function() { signOut(auth); }
+        window.logout = function() {
+            signOut(auth).then(() => {
+                window.location.reload(); // نفس منطق تسجيل الدخول: تحديث كامل للموقع كي لا يبقى أي أثر لبيانات الحساب السابق ظاهراً
+            }).catch(error => alert("حدث خطأ أثناء تسجيل الخروج: " + error.message));
+        }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -1255,10 +1334,12 @@ window.signInWithGoogle = function() {
                 assistantProfile = data.profile || { queries: [], subjects: {}, files: [] };
                 if (!chatRestored && Array.isArray(data.chat) && data.chat.length) {
                     chatHistory = data.chat;
+                    chatHistory.forEach(m => { if (!m.id) m.id = newMsgId(); }); // توافق مع محادثات محفوظة قبل إضافة المعرّفات
                     const box = document.getElementById('chat-messages');
                     box.innerHTML = '';
-                    chatHistory.forEach(m => appendMsg(m.role === 'user' ? 'user' : 'bot', m.text, false));
+                    chatHistory.forEach(m => appendMsg(m.role === 'user' ? 'user' : 'bot', m.text, false, { historyId: m.id, replyTo: m.replyTo }));
                     chatRestored = true;
+                    box.scrollTop = box.scrollHeight; // ابدأ من آخر الرسائل لا من أولها عند العودة للدردشة
                 }
             }).catch(() => { assistantProfile = { queries: [], subjects: {}, files: [] }; });
         }
@@ -1335,28 +1416,227 @@ window.signInWithGoogle = function() {
 
             document.getElementById('chat-panel').classList.add('open');
             fab.classList.add('hidden');
-            if (!document.getElementById('chat-messages').children.length) {
-                appendMsg('bot', 'أهلاً بك \ud83d\udc4b أنا لبيبة، مساعدة رقمية\nاسألني عن أي مادة أو موضوع، وسأبحث لك في المكتبة عن الملفات المناسبة.', false);
+            window.dismissChatHint();
+            const box = document.getElementById('chat-messages');
+            if (!box.children.length) {
+                appendMsg('bot', CHAT_GREETING, false, { historyId: newMsgId() });
             }
+            box.scrollTop = box.scrollHeight; // اعرض آخر الرسائل مباشرة عند فتح الدردشة
             setTimeout(() => document.getElementById('chat-input').focus(), 300);
         }
         window.closeChat = function() {
             document.getElementById('chat-panel').classList.remove('open');
             document.getElementById('chat-fab').classList.remove('hidden');
+            window.cancelReply();
         }
+
+        // ---------- فقاعة تعريف زر المساعد (قبل أول ضغطة) ----------
+        let chatHintAutoHideTimer = null;
+        window.dismissChatHint = function() {
+            const hint = document.getElementById('chat-fab-hint');
+            if (hint) hint.classList.remove('show');
+            if (chatHintAutoHideTimer) { clearTimeout(chatHintAutoHideTimer); chatHintAutoHideTimer = null; }
+            try { localStorage.setItem('nabras_chat_hint_seen', '1'); } catch (e) {}
+            window.removeEventListener('resize', positionChatHint);
+        }
+        function positionChatHint() {
+            const hint = document.getElementById('chat-fab-hint');
+            if (!hint || !hint.classList.contains('show')) return;
+            let bottomOffset = 96; // فوق الزر العائم مباشرة (22 هامش + 62 ارتفاع الزر + مسافة صغيرة)
+            // تجنّب تغطية الزر العريض (التصنيف حسب المعلم/عرض كل الملفات) إن كان ظاهراً قرب أسفل الشاشة
+            const catScreen = document.getElementById('category-screen');
+            if (catScreen && catScreen.classList.contains('active')) {
+                const candidates = [document.getElementById('teacher-mode-btn'), document.getElementById('show-all-files-btn')];
+                for (const btn of candidates) {
+                    if (btn && btn.offsetParent !== null) {
+                        const r = btn.getBoundingClientRect();
+                        // اربط فقط إن كان الزر ظاهراً فعلاً وقريباً من أسفل الشاشة (لا لو كان أسفل الشاشة بلا تمرير أو تم تجاوزه للأعلى)
+                        const nearBottom = r.bottom > 0 && r.top < window.innerHeight && r.bottom > window.innerHeight - 300;
+                        if (nearBottom) {
+                            const distanceFromBottom = window.innerHeight - r.top;
+                            bottomOffset = Math.min(Math.max(bottomOffset, distanceFromBottom + 14), window.innerHeight - 80);
+                        }
+                        break;
+                    }
+                }
+            }
+            hint.style.bottom = bottomOffset + 'px';
+        }
+        function maybeShowChatHint() {
+            let seen = false;
+            try { seen = localStorage.getItem('nabras_chat_hint_seen') === '1'; } catch (e) {}
+            if (seen) return;
+            const hint = document.getElementById('chat-fab-hint');
+            if (!hint || document.getElementById('chat-panel').classList.contains('open')) return;
+            positionChatHint();
+            hint.classList.add('show');
+            window.addEventListener('resize', positionChatHint);
+            chatHintAutoHideTimer = setTimeout(window.dismissChatHint, 9000);
+        }
+        function scheduleChatHint() {
+            const navLogo = document.getElementById('navbar-logo');
+            function go() { setTimeout(maybeShowChatHint, 500); }
+            if (!navLogo) { setTimeout(maybeShowChatHint, 1800); return; }
+            if (navLogo.classList.contains('intro-revealed')) { go(); return; } // انتهت مقدّمة الشعار بالفعل (مثلاً وضع تقليل الحركة)
+            const obs = new MutationObserver(() => {
+                if (navLogo.classList.contains('intro-revealed')) { obs.disconnect(); go(); }
+            });
+            obs.observe(navLogo, { attributes: true, attributeFilter: ['class'] });
+            setTimeout(() => { obs.disconnect(); maybeShowChatHint(); }, 7000); // شبكة أمان لو تعطّلت مقدّمة الشعار
+        }
+        window.addEventListener('load', scheduleChatHint);
         window.autoGrowChatInput = function(el) {
             el.style.height = 'auto';
             el.style.height = Math.min(el.scrollHeight, 110) + 'px';
         }
 
-        function appendMsg(kind, text, scroll = true) {
+        function appendMsg(kind, text, scroll = true, opts = {}) {
             const box = document.getElementById('chat-messages');
             const div = document.createElement('div');
             div.className = 'msg ' + kind;
-            div.innerText = text;
+            if (opts.replyTo && opts.replyTo.text) {
+                const q = document.createElement('div');
+                q.className = 'msg-reply-quote';
+                q.textContent = opts.replyTo.text;
+                div.appendChild(q);
+            }
+            const body = document.createElement('div');
+            body.className = 'msg-body';
+            body.innerText = text;
+            div.appendChild(body);
             box.appendChild(div);
             if (scroll) box.scrollTop = box.scrollHeight;
+            if (opts.historyId && (kind === 'user' || kind === 'bot')) attachMsgGestures(div, kind, opts.historyId);
             return div;
+        }
+
+        // ---------- إيماءات الرسائل: سحب للداخل للرد، ضغط مطوّل للحذف ----------
+        function attachMsgGestures(div, kind, historyId) {
+            div.dataset.msgId = historyId;
+            const REPLY_THRESHOLD = 56;   // px حتى يُعتبر السحب رداً
+            const MOVE_CANCEL = 8;        // px حركة تُلغي الضغط المطوّل وتبدأ السحب
+            const LONG_PRESS_MS = 550;
+            const inwardSign = kind === 'user' ? 1 : -1; // رسائل المستخدم يسار الشاشة (للداخل=يمين)، رسائل الروبوت يمين الشاشة (للداخل=يسار)
+
+            let startX = 0, startY = 0, dragging = false, moved = false, longPressTimer = null, activePointerId = null;
+
+            function clearPressTimer() { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } }
+
+            function resetTransform() {
+                div.style.transition = 'transform 0.25s cubic-bezier(.4,0,.2,1)';
+                div.style.transform = '';
+                div.classList.remove('swiping', 'reply-ready');
+                setTimeout(() => { div.style.transition = ''; }, 260);
+            }
+
+            function deleteMessageWithAnim() {
+                div.classList.remove('pressing');
+                div.style.transition = 'opacity .22s ease, transform .22s ease';
+                div.style.transform = 'scale(.92)';
+                div.style.opacity = '0';
+                chatHistory = chatHistory.filter(m => m.id !== historyId);
+                if (pendingReplyTo && pendingReplyTo.id === historyId) window.cancelReply();
+                setTimeout(() => div.remove(), 220);
+                saveAssistantState();
+            }
+
+            function onDown(e) {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                activePointerId = e.pointerId;
+                startX = e.clientX; startY = e.clientY; dragging = true; moved = false;
+                div.style.transition = 'none';
+                div.classList.add('pressing');
+                clearPressTimer();
+                longPressTimer = setTimeout(() => { if (dragging && !moved) deleteMessageWithAnim(); }, LONG_PRESS_MS);
+                try { div.setPointerCapture(e.pointerId); } catch (err) {}
+            }
+            function onMove(e) {
+                if (!dragging || e.pointerId !== activePointerId) return;
+                const dx = e.clientX - startX, dy = e.clientY - startY;
+                if (!moved && Math.hypot(dx, dy) > MOVE_CANCEL) {
+                    moved = true;
+                    clearPressTimer();
+                    div.classList.remove('pressing');
+                }
+                if (!moved || Math.abs(dy) > Math.abs(dx)) return;
+                let delta = dx * inwardSign;
+                delta = Math.max(0, Math.min(delta, REPLY_THRESHOLD * 1.5));
+                div.classList.add('swiping');
+                div.classList.toggle('reply-ready', delta > REPLY_THRESHOLD);
+                div.style.transform = 'translateX(' + (delta * inwardSign) + 'px)';
+            }
+            function onUp(e) {
+                if (!dragging || e.pointerId !== activePointerId) return;
+                dragging = false;
+                clearPressTimer();
+                div.classList.remove('pressing');
+                const wasReady = moved && div.classList.contains('reply-ready');
+                if (wasReady) startReply(historyId, kind);
+                resetTransform();
+                activePointerId = null;
+            }
+
+            div.addEventListener('pointerdown', onDown);
+            div.addEventListener('pointermove', onMove);
+            div.addEventListener('pointerup', onUp);
+            div.addEventListener('pointercancel', onUp);
+        }
+
+        function startReply(id, kind) {
+            const entry = chatHistory.find(m => m.id === id);
+            if (!entry) return;
+            pendingReplyTo = { id: id, role: kind, text: entry.text };
+            renderReplyBar();
+            const input = document.getElementById('chat-input');
+            if (input) input.focus();
+        }
+
+        function renderReplyBar() {
+            if (!pendingReplyTo) return;
+            let bar = document.getElementById('reply-preview-bar');
+            if (!bar) {
+                bar = document.createElement('div');
+                bar.id = 'reply-preview-bar';
+                bar.className = 'reply-preview-bar';
+                const inputBar = document.querySelector('.chat-input-bar');
+                inputBar.parentNode.insertBefore(bar, inputBar);
+            }
+            const who = pendingReplyTo.role === 'user' ? 'ردّك السابق' : 'ردّ لبيبة';
+            const snippetSrc = pendingReplyTo.text || '';
+            const snippet = snippetSrc.length > 90 ? snippetSrc.slice(0, 90) + '…' : snippetSrc;
+            bar.innerHTML = '';
+            const textWrap = document.createElement('div');
+            textWrap.className = 'reply-preview-text';
+            const label = document.createElement('strong');
+            label.textContent = who;
+            const snippetEl = document.createElement('div');
+            snippetEl.textContent = snippet;
+            textWrap.appendChild(label);
+            textWrap.appendChild(snippetEl);
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'reply-preview-cancel';
+            cancelBtn.type = 'button';
+            cancelBtn.setAttribute('aria-label', 'إلغاء الرد');
+            cancelBtn.innerHTML = '&times;';
+            cancelBtn.onclick = function () { window.cancelReply(); };
+            bar.appendChild(textWrap);
+            bar.appendChild(cancelBtn);
+        }
+
+        window.cancelReply = function() {
+            pendingReplyTo = null;
+            const bar = document.getElementById('reply-preview-bar');
+            if (bar) bar.remove();
+        }
+
+        window.deleteEntireChat = function() {
+            if (!chatHistory.length) return;
+            if (!confirm('هل تريد حذف كل رسائل هذه المحادثة؟ لا يمكن التراجع عن هذا.')) return;
+            chatHistory = [];
+            window.cancelReply();
+            document.getElementById('chat-messages').innerHTML = '';
+            saveAssistantState();
+            appendMsg('bot', CHAT_GREETING, false, { historyId: newMsgId() });
         }
 
         function appendChatFiles(files) {
@@ -1398,10 +1678,15 @@ window.signInWithGoogle = function() {
                 return;
             }
 
+            // خذ نسخة من الرد المعلَّق (إن وجد عبر سحب رسالة للداخل) ثم امسحه فوراً، فقد استُهلك بهذه الرسالة
+            const replySnapshot = pendingReplyTo ? { role: pendingReplyTo.role, text: pendingReplyTo.text } : null;
+            window.cancelReply();
+
             input.value = '';
             input.style.height = 'auto';
-            appendMsg('user', text);
-            chatHistory.push({ role: 'user', text });
+            const userId = newMsgId();
+            appendMsg('user', text, true, { historyId: userId, replyTo: replySnapshot });
+            chatHistory.push(Object.assign({ role: 'user', text, id: userId }, replySnapshot ? { replyTo: replySnapshot } : {}));
             chatBusy = true;
             document.getElementById('chat-send').disabled = true;
             showTyping();
@@ -1412,10 +1697,14 @@ window.signInWithGoogle = function() {
                 const recentUserText = chatHistory.filter(m => m.role === 'user').slice(-2).map(m => m.text).join(' ');
                 const candidates = retrieveCandidates(index, recentUserText, 12);
 
-                const contents = chatHistory.slice(-10).map(m => ({
-                    role: m.role === 'user' ? 'user' : 'model',
-                    parts: [{ text: m.text }]
-                }));
+                const contents = chatHistory.slice(-10).map(m => {
+                    let t = m.text;
+                    if (m.replyTo && m.replyTo.text) {
+                        const who = m.replyTo.role === 'user' ? 'رسالته السابقة' : 'ردّ لبيبة السابق';
+                        t = '(رداً على ' + who + ': "' + m.replyTo.text.slice(0, 150) + '")\n' + t;
+                    }
+                    return { role: m.role === 'user' ? 'user' : 'model', parts: [{ text: t }] };
+                });
 
                 const data = await callGemini({
                     system_instruction: { parts: [{ text: buildSystemPrompt(candidates) }] },
@@ -1437,10 +1726,11 @@ window.signInWithGoogle = function() {
                 }
 
                 hideTyping();
-                appendMsg('bot', reply);
+                const botId = newMsgId();
+                appendMsg('bot', reply, true, { historyId: botId });
                 if (shown.length) appendChatFiles(shown.slice(0, 5));
 
-                chatHistory.push({ role: 'model', text: reply });
+                chatHistory.push({ role: 'model', text: reply, id: botId });
                 updateAssistantProfile(text, shown.length ? shown : candidates.slice(0, 3));
                 saveAssistantState();
             } catch (err) {
@@ -1478,7 +1768,7 @@ window.signInWithGoogle = function() {
         };
 
         window.addEventListener('load', () => {
-            setTimeout(() => { if (!currentUser) document.getElementById('login-popup').classList.add('show'); }, 3000);
+            setTimeout(() => { if (!currentUser) document.getElementById('login-popup').classList.add('show'); }, 15000);
         });
 
         window.closeLoginPopup = function() { document.getElementById('login-popup').classList.remove('show'); }
