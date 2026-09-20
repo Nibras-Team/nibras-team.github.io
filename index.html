@@ -24,11 +24,21 @@ footer p {
 }
 
         :root {
-            --primary-color: #1e3799; 
-            --accent-color: #f6b93b;  
-            --bg-color: #f1f2f6;
+            --primary-color: #1e3799;              /* اللون الأساسي: الشعار، الأزرار، العناوين */
+            --primary-color-rgb: 30, 55, 153;   /* نفس اللون الأساسي بصيغة RGB — لتأثيرات الشفافة (ظلال/توهجات). عدّل هذا السطر ليطابق أي لون أساسي جديد */ 
+            --accent-color: #f6b93b;               /* لون التمييز: التحويم وزر تسجيل الدخول */
+            --accent-color-rgb: 246, 185, 59;  /* نفس لون التمييز بصيغة RGB — لتأثيرات الشفافة. عدّل هذا السطر ليطابق أي لون تمييز جديد */  
+            --bg-color: #f1f2f6;                   /* لون خلفية الصفحة العامة */
             --white: #ffffff;
             --text-dark: #2f3542;
+            --text-muted: #666666;              /* نص ثانوي (رسائل "لا توجد ملفات") */
+            --border-color: #dddddd;             /* حدود حقول البحث والدردشة */
+
+            /* ألوان حالة — منفصلة عن هوية الموقع (أخضر=نجاح/مشاهدة، أحمر=خطر/خروج) */
+            --success-color: #2ed573;
+            --danger-color: #ff4757;
+            --note-bg: #fff4d6;                  /* خلفية رسائل الملاحظات بالدردشة */
+            --note-text: #8a6d1f;                /* نص رسائل الملاحظات بالدردشة */
             --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             --site-font: 'Cocon Next Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* خط الموقع (الحروف الناقصة تنزل تلقائياً للخطوط التالية) */
             --system-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* الخط الأصلي: لرسائل المحادثة مع المساعد */
@@ -68,13 +78,13 @@ footer p {
             margin-bottom: 21px; /* مسافة بينه وبين المحتوى */
         }
         #search-input { 
-            flex: 1; padding: 12px 15px; border: 2px solid #ddd; 
+            flex: 1; padding: 12px 15px; border: 2px solid var(--border-color); 
             border-radius: 10px; outline: none; font-size: 1rem; transition: 0.3s;
             width: 100%;
         }
         #search-input:focus { border-color: var(--primary-color); }
         #search-btn { 
-            padding: 10px 20px; background: var(--primary-color); color: white; 
+            padding: 10px 20px; background: var(--primary-color); color: var(--white); 
             border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s;
             white-space: nowrap;
         }
@@ -143,7 +153,7 @@ footer p {
         /* القائمة الجانبية */
         .sidebar {
             position: fixed; top: 0; left: -320px; width: 320px; height: 100%;
-            background: linear-gradient(145deg, #ffffff 0%, #f1f2f6 100%);
+            background: linear-gradient(145deg, var(--white) 0%, var(--bg-color) 100%);
             box-shadow: 5px 0 25px rgba(0,0,0,0.15); transition: var(--transition);
             z-index: 1000; padding: 30px 20px; overflow-y: auto; border-right: 4px solid var(--accent-color);
         }
@@ -154,7 +164,7 @@ footer p {
         .login-btn {
             display: block; width: 100%; text-align: center; background: var(--accent-color); color: var(--primary-color);
             padding: 15px; border-radius: 10px; font-weight: bold; border: none; cursor: pointer;
-            text-decoration: none; margin-bottom: 25px; transition: 0.3s; box-shadow: 0 4px 10px rgba(246, 185, 59, 0.3);
+            text-decoration: none; margin-bottom: 25px; transition: 0.3s; box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.3);
         }
         .login-btn:hover { background: var(--primary-color); color: var(--white); transform: translateY(-3px); }
 
@@ -181,7 +191,7 @@ footer p {
         .fav-btn { cursor: pointer; font-size: 1.6rem; user-select: none; transition: transform 0.2s; background: none; border: none; }
         .fav-btn:hover { transform: scale(1.2); }
         .viewed-badge { 
-            background: #2ed573; color: white; padding: 4px 10px; 
+            background: var(--success-color); color: var(--white); padding: 4px 10px; 
             border-radius: 20px; font-size: 0.75rem; font-weight: bold; 
             display: inline-flex; align-items: center; gap: 5px;
         }
@@ -240,8 +250,8 @@ footer p {
 }
 
 .popup-login-btn {
-    background-color: var(--primary-color, #0056b3);
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--white);
     border: none;
     padding: 12px 20px;
     border-radius: 8px;
@@ -292,7 +302,7 @@ footer p {
         #chat-fab {
             position: fixed; bottom: 22px; left: 22px; width: 62px; height: 62px; border-radius: 50%;
             background: var(--primary-color); color: var(--white); border: none; cursor: pointer;
-            box-shadow: 0 6px 22px rgba(30, 55, 153, 0.35); z-index: 1200;
+            box-shadow: 0 6px 22px rgba(var(--primary-color-rgb), 0.35); z-index: 1200;
             display: flex; align-items: center; justify-content: center; font-size: 1.7rem;
             transition: var(--transition);
         }
@@ -323,7 +333,7 @@ footer p {
             max-width: min(78vw, 280px);
             background: var(--white); color: var(--text-dark);
             border-radius: 16px; border-bottom-left-radius: 4px;
-            padding: 12px 14px; box-shadow: 0 8px 24px rgba(30, 55, 153, 0.22);
+            padding: 12px 14px; box-shadow: 0 8px 24px rgba(var(--primary-color-rgb), 0.22);
             font-size: 0.88rem; line-height: 1.6; text-align: right;
             opacity: 0; transform: translateY(10px) scale(0.92); transform-origin: bottom left;
             pointer-events: none;
@@ -379,7 +389,7 @@ footer p {
         @keyframes msgIn { from { opacity: 0; transform: translateY(18px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .msg.user { align-self: flex-end; background: var(--primary-color); color: var(--white); border-bottom-left-radius: 4px; }
         .msg.bot { align-self: flex-start; background: var(--white); color: var(--text-dark); border-bottom-right-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .msg.note { align-self: center; background: #fff4d6; color: #8a6d1f; font-size: 0.9rem; text-align: center; max-width: 95%; }
+        .msg.note { align-self: center; background: var(--note-bg); color: var(--note-text); font-size: 0.9rem; text-align: center; max-width: 95%; }
 
         /* ---- إيماءات الرسائل: سحب للداخل = رد، ضغط مطوّل = تفعيل وضع تحديد الرسائل للحذف ---- */
         .msg.user, .msg.bot { position: relative; touch-action: pan-y; }
@@ -396,9 +406,9 @@ footer p {
         .msg.reply-ready::before { opacity: 1; transform: translateY(-50%) scale(1); }
         .msg.user::after, .msg.bot::after {
             content: ''; position: absolute; inset: 0; border-radius: inherit;
-            background: rgba(246, 185, 59, 0); pointer-events: none; transition: background 0.15s ease;
+            background: rgba(var(--accent-color-rgb), 0); pointer-events: none; transition: background 0.15s ease;
         }
-        .msg.pressing::after { background: rgba(246, 185, 59, 0.45); transition: background 0.55s linear; }
+        .msg.pressing::after { background: rgba(var(--accent-color-rgb), 0.45); transition: background 0.55s linear; }
 
         /* ---- وضع تحديد الرسائل: دائرة اختيار على كل رسالة، وإطار مميّز للرسائل المحددة ---- */
         .msg-check {
@@ -417,7 +427,7 @@ footer p {
 
         .msg-reply-quote { font-size: 0.8rem; opacity: 0.9; padding: 6px 10px; margin-bottom: 8px; border-radius: 8px; max-height: 4.6em; overflow: hidden; }
         .msg.user .msg-reply-quote { background: rgba(255,255,255,0.18); border-right: 3px solid rgba(255,255,255,0.65); }
-        .msg.bot .msg-reply-quote { background: rgba(30,55,153,0.07); border-right: 3px solid var(--primary-color); color: var(--primary-color); }
+        .msg.bot .msg-reply-quote { background: rgba(var(--primary-color-rgb), 0.07); border-right: 3px solid var(--primary-color); color: var(--primary-color); }
 
         .reply-preview-bar {
             display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -455,7 +465,7 @@ footer p {
             box-shadow: 0 -4px 12px rgba(0,0,0,0.06); flex-shrink: 0;
         }
         #chat-input {
-            flex: 1; padding: 12px 15px; border: 2px solid #ddd; border-radius: 12px;
+            flex: 1; padding: 12px 15px; border: 2px solid var(--border-color); border-radius: 12px;
             outline: none; font-size: 1rem; resize: none; max-height: 110px; font-family: inherit;
         }
         #chat-input:focus { border-color: var(--primary-color); }
@@ -470,7 +480,7 @@ footer p {
     <style id="intro-reveal-styles">
       #intro-overlay {
         position: fixed; inset: 0; z-index: 99999;
-        background: #ffffff;
+        background: var(--white);
         display: flex; align-items: center; justify-content: center;
         transition: opacity .3s ease;
       }
@@ -631,9 +641,9 @@ footer p {
             </div>
 
             <div id="user-menu" style="display: none; flex-direction: column; gap: 10px; margin-bottom: 25px;">
-                <button class="btn" style="padding: 12px; font-size: 1rem; border-color: #ff4757; color: #ff4757;" onclick="showUserFiles('favorites')">المفضلة 🤍</button>
-                <button class="btn" style="padding: 12px; font-size: 1rem; border-color: #2ed573; color: #2ed573;" onclick="showUserFiles('history')">السجل 🕒</button>
-                <button class="btn" style="padding: 12px; font-size: 1rem; background: #ff4757; color: white; border: none;" onclick="logout()">تسجيل الخروج</button>
+                <button class="btn" style="padding: 12px; font-size: 1rem; border-color: var(--danger-color); color: var(--danger-color);" onclick="showUserFiles('favorites')">المفضلة 🤍</button>
+                <button class="btn" style="padding: 12px; font-size: 1rem; border-color: var(--success-color); color: var(--success-color);" onclick="showUserFiles('history')">السجل 🕒</button>
+                <button class="btn" style="padding: 12px; font-size: 1rem; background: var(--danger-color); color: var(--white); border: none;" onclick="logout()">تسجيل الخروج</button>
             </div>
         </div>
 
@@ -990,7 +1000,7 @@ footer p {
                     });
                     applyScrollFx();
                 } else {
-                    listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
+                    listContainer.innerHTML = "<p style='padding:20px; color:var(--text-muted);'>لا توجد ملفات هنا بعد.</p>";
                 }
             }, { onlyOnce: true });
         }
@@ -1020,7 +1030,7 @@ footer p {
                         .map(f => fileCardHtml(f.id, f, relevantIds ? null : f.path)).join('');
                     applyScrollFx();
                 } else {
-                    listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
+                    listContainer.innerHTML = "<p style='padding:20px; color:var(--text-muted);'>لا توجد ملفات هنا بعد.</p>";
                 }
             }).catch(() => {
                 loader.style.display = "none";
@@ -1082,7 +1092,7 @@ footer p {
                     });
                     applyScrollFx();
                 } else {
-                    listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات لهذا المعلم بعد.</p>";
+                    listContainer.innerHTML = "<p style='padding:20px; color:var(--text-muted);'>لا توجد ملفات لهذا المعلم بعد.</p>";
                 }
             }, { onlyOnce: true });
         }
@@ -1146,7 +1156,7 @@ footer p {
                     'نتائج البحث عن: ' + q + (results.length ? ' (' + results.length + ')' : '');
                 listContainer.innerHTML = results.length
                     ? results.map(f => fileCardHtml(f.id, f, f.path)).join('')
-                    : "<p style='padding:20px; color:#666;'>لم يتم العثور على ملفات تطابق بحثك.</p>";
+                    : "<p style='padding:20px; color:var(--text-muted);'>لم يتم العثور على ملفات تطابق بحثك.</p>";
                 applyScrollFx();
             }).catch(() => {
                 if (seq !== searchSeq) return;
@@ -1320,7 +1330,7 @@ window.signInWithGoogle = function() {
                 });
                 applyScrollFx();
             } else {
-                listContainer.innerHTML = "<p style='padding:20px; color:#666;'>لا توجد ملفات هنا بعد.</p>";
+                listContainer.innerHTML = "<p style='padding:20px; color:var(--text-muted);'>لا توجد ملفات هنا بعد.</p>";
             }
         }
 
