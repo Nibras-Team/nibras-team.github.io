@@ -18,9 +18,16 @@
             font-style: normal;
             font-display: swap;
         }
+footer {
+    text-align: center;
+    padding: 25px 5%;
+    background: var(--white);
+    border-top: 1px solid var(--border-color);
+}
 footer p {
     margin: 0; /* إزالة المسافات الافتراضية الزائدة حول النص */
-    font-size: 16px; /* حجم الخط */
+    font-size: 13px; /* حجم الخط: صغير */
+    color: var(--text-muted);
 }
 
         :root {
@@ -740,10 +747,11 @@ footer p {
         </div>
     </div>
 
+
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, getAdditionalUserInfo } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBZIfcH0HI0Nm3aXN8uoP4C6y49cF0Qvl4",
@@ -1220,10 +1228,29 @@ footer p {
             });
         }
 
-window.signInWithGoogle = function() {
-    signInWithPopup(auth, provider).then(() => {
-        window.closeLoginPopup(); // يتم إغلاق النافذة فقط بعد نجاح الدخول
-        window.location.reload(); // تحديث الموقع بالكامل عند تسجيل الدخول أو تبديل الحساب، ليعكس بيانات الحساب الجديد (المفضلة، السجل، المحادثة) بدل بقاء أثر الحساب السابق ظاهراً
+const WELCOME_ENDPOINT = "https://script.google.com/macros/s/AKfycbwgNP86XY5t-LqBy47GcGQp5PmHk0kR6NjkgURH-itw4ppX4lLNgHLH0y5xG9ESf0ae/exec";   // رابط النشر، ينتهي بـ /exec
+
+async function sendWelcomeMail(result) {
+  try {
+    if (!WELCOME_ENDPOINT.startsWith("https://")) return;
+    if (!getAdditionalUserInfo(result)?.isNewUser) return;        // فقط عند أول تسجيل
+    const idToken = await result.user.getIdToken();
+    fetch(WELCOME_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },    // طلب بسيط بدون preflight
+      body: JSON.stringify({ idToken }),
+      keepalive: true                                             // يكمل الطلب رغم location.reload() بعد الدخول
+    }).catch(() => {});
+  } catch (e) {
+    console.warn("welcome mail skipped:", e);                     // لا نعطّل تسجيل الدخول أبداً
+  }
+}
+
+window.signInWithGoogle = function () {
+    signInWithPopup(auth, provider).then(async (result) => {
+        await sendWelcomeMail(result);   // يرسل الطلب فقط ولا ينتظر وصول الإيميل
+        window.closeLoginPopup();
+        window.location.reload();
     }).catch(error => alert("حدث خطأ أثناء تسجيل الدخول: " + error.message));
 }
         window.logout = function() {
