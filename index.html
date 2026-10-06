@@ -1411,6 +1411,7 @@ function stemAr(w) {
     if (/^[a-z0-9]+$/.test(w)) return w;
     const pre = ['وال', 'بال', 'كال', 'فال', 'لل', 'ال'].find(p => w.startsWith(p) && w.length - p.length >= 2);
     if (pre) w = w.slice(pre.length);
+    if (w.length === 5 && w[0] === 'ا' && w[3] === 'ا') w = w[1] + w[2] + w[4];   // جمع التكسير
     for (let i = 0; i < 2; i++) {
         const suf = ['ات', 'ان', 'ين', 'ون', 'ها', 'يه', 'ه', 'ي'].find(s => w.endsWith(s) && w.length - s.length >= 3);
         if (!suf) break;
@@ -1438,11 +1439,18 @@ function editLE1(a, b) {   // مسافة تحرير ≤ 1 (استبدال/حذف
 }
 function buildEngine(index) {
     const df = new Map();
-    const docs = index.map(f => {
-        const tf = new Map();
-        Object.keys(FIELD_W).forEach(k => new Set(tokenizeAr(f[k]).map(stemAr)).forEach(t => tf.set(t, (tf.get(t) || 0) + FIELD_W[k])));
+    const sl = index.map(f => new Set(tokenizeAr(f.summary).map(stemAr)));
+    const avg = sl.reduce((a, x) => a + x.size, 0) / Math.max(sl.length, 1) || 1;   // متوسط طول الشرح
+    const docs = index.map((f, i) => {
+        const tf = new Map(), nm = new Set(tokenizeAr(f.name).map(stemAr));
+        Object.keys(FIELD_W).forEach(k => {
+            const toks = k === 'summary' ? sl[i] : new Set(tokenizeAr(f[k]).map(stemAr));
+            // الشرح القصير المركّز على الموضوع يأخذ وزناً أكبر من شرح طويل يمرّ بالموضوع عرَضاً (BM25)
+            const w = k === 'summary' ? FIELD_W.summary * avg / (0.25 * avg + 0.75 * Math.max(sl[i].size, 1)) : FIELD_W[k];
+            toks.forEach(t => tf.set(t, (tf.get(t) || 0) + w));
+        });
         tf.forEach((_, t) => df.set(t, (df.get(t) || 0) + 1));
-        return { f, tf };
+        return { f, tf, nm };
     });
     const idf = new Map();
     df.forEach((d, t) => idf.set(t, Math.log(1 + (docs.length - d + 0.5) / (d + 0.5))));
@@ -1466,22 +1474,36 @@ function searchFiles(index, query, limit, opts) {
     const ctx = opts.prev ? prep(opts.prev).filter(t => !main.includes(t)) : [];   // سياق الرسالة السابقة بوزن نصف
     const mk = (ts, k) => ts.map(t => ({ m: expandTerm(eng, t), k })).filter(x => x.m.size);
     const exp = mk(main, 1), all = exp.concat(mk(ctx, 0.5));
-    if (!all.length) return [];
+    if (!all.length) { const none = []; none.total = 0; return none; }
     const res = [];
-    eng.docs.forEach(({ f, tf }) => {
-        let score = 0, hit = 0;
+    eng.docs.forEach(({ f, tf, nm }) => {
+        let score = 0, hit = 0, named = false;
         all.forEach(x => {
             let best = 0;
-            x.m.forEach((w, tok) => { const v = tf.get(tok); if (v) best = Math.max(best, w * eng.idf.get(tok) * v / (v + 1.5)); });
+            x.m.forEach((w, tok) => {
+                const v = tf.get(tok);
+                if (!v) return;
+                best = Math.max(best, w * eng.idf.get(tok) * v / (v + 1.5));
+                if (w >= 0.7 && nm.has(tok)) named = true;   // الاسم نفسه يذكر الموضوع
+            });
             if (best) { score += best * x.k; if (x.k === 1) hit++; }
         });
         if (!score) return;
         if (opts.avoid && opts.avoid.has(f.id)) score *= 0.3;
-        res.push({ f, score: score * (exp.length ? 0.55 + 0.45 * hit / exp.length : 1), hit, total: exp.length });
+        res.push({ f, score: score * (exp.length ? 0.55 + 0.45 * hit / exp.length : 1), hit, total: exp.length, named });
     });
     res.sort((a, b) => b.score - a.score);
     const top = res.length ? res[0].score : 0;
-    return res.filter(x => x.score >= top * (opts.cut || 0.3)).slice(0, limit);
+    let out = res.filter(x => x.score >= top * (opts.cut || 0.3));
+    const total = res.filter(x => x.score >= top * 0.15).length;
+    if (opts.mix) {   // حصة محجوزة لملفات اسمها لا يذكر الموضوع لكن شرحها يذكره
+        const head = out.slice(0, limit - opts.mix), seen = new Set(head);
+        const hidden = res.filter(x => !seen.has(x) && !x.named && x.score >= top * 0.08).slice(0, opts.mix);
+        hidden.forEach(x => seen.add(x));
+        out = head.concat(hidden, out.filter(x => !seen.has(x)).slice(0, limit - head.length - hidden.length));
+    } else out = out.slice(0, limit);
+    out.total = total;
+    return out;
 }
 function retrieveCandidates(index, queryText, limit) { return searchFiles(index, queryText, limit).map(x => x.f); }
 
@@ -1502,6 +1524,8 @@ function smartRules(meta) {
         + '- القائمة مرتّبة من الأنسب إلى الأقل مناسبة؛ لا ترشّح ملفاً ضعيف الصلة لملء العدد، والأفضل من 1 إلى 4 ملفات.\n'
         + '- إن طلب مراجعة أو خطة دراسة فرتّب الملفات من الأسهل إلى الأصعب اعتماداً على الشرح، واقترح ترتيب العمل عليها.\n'
         + '- إن سأل عن "غيرها" أو "المزيد" فاعرض البدائل لا الملفات نفسها التي رشّحتها سابقاً.\n';
+    r += '- بعض الملفات اسمها عام لكن شرحها يذكر الموضوع؛ لا تستبعد ملفاً لأن اسمه لا يذكر الموضوع، وإن رشّحته فاذكر للطالب ما في شرحه مما يناسب سؤاله.\n';
+    if (meta && meta.total > 14) r += '- عدد الملفات المتعلقة بسؤاله نحو ' + meta.total + ' وأنت ترى أنسبها فقط: اعرض 1 إلى 4 منها ثم اسأله ما يضيّق الاختيار (السنة؟ مذاكرة أم كويز أم ورقة عمل؟ الأستاذ؟ مع الحل؟) أو اعرض عليه المزيد.\n';
     if (meta && meta.conf < 0.6) r += '- مطابقة القائمة لسؤاله ضعيفة أو جزئية: قل ذلك بصدق، واذكر الأقرب، واقترح عليه البحث بكلمات أخرى مستعيناً بهذه النظرة: ' + meta.overview + '\n';
     return r;
 }
@@ -1959,9 +1983,9 @@ function smartRules(meta) {
                 // نبني استعلام الاستحضار من آخر رسالتين للطالب، ليعمل مع أسئلة المتابعة القصيرة
                 const userMsgs = chatHistory.filter(m => m.role === 'user').map(m => m.text);
                 const wantsMore = /غيرها|غيره|اخري|اخر|مزيد|بدايل|بدائل|كمان|اكثر/.test(normalizeAr(text));
-                const hits = searchFiles(index, text, 12, { prev: userMsgs.length > 1 ? userMsgs[userMsgs.length - 2] : '', avoid: wantsMore ? SHOWN_IDS : null });
+                const hits = searchFiles(index, text, 14, { mix: 4, prev: userMsgs.length > 1 ? userMsgs[userMsgs.length - 2] : '', avoid: wantsMore ? SHOWN_IDS : null });
                 const candidates = hits.map(x => x.f);
-                const meta = { conf: hits.length ? hits[0].hit / Math.max(hits[0].total, 1) : 0, overview: libraryOverview(index) };
+                const meta = { conf: hits.length ? hits[0].hit / Math.max(hits[0].total, 1) : 0, total: hits.total || 0, overview: libraryOverview(index) };
 
                 const contents = chatHistory.slice(-10).map(m => {
                     let t = m.text;
